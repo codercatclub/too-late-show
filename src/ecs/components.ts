@@ -137,3 +137,14 @@ export const AudioC: Component<AudioCData> = {
     loop: false
   },
 };
+
+interface NeuronCoreCData {
+  video: string;
+}
+
+export const NeuronCoreC: Component<NeuronCoreCData> = {
+  type: "NeuronCore",
+  data: {
+    video: ""
+  }
+};

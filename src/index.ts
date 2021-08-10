@@ -12,7 +12,7 @@ import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Vector3, Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { CCMaterialC } from "./ecs/components";
+import { CCMaterialC, NeuronCoreC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -20,12 +20,35 @@ import { CCMaterialSystem } from "./systems/CCMaterialSystem";
 import { AudioSystem } from "./systems/core/AudioSystem";
 import { StandardPrimitiveSystem } from "./systems/core/StandardPrimitiveSystem";
 import { StatsSystem } from "./systems/core/StatsSystem";
+import { NeuronCoreSystem } from "./systems/NeuronCoreSystem";
+
+interface Neuron {
+  src: string;
+  video: string;
+}
+
+const Neuron = ({ src, video }: Neuron) => [
+  extend(
+    Asset({
+      src,
+      part: "/Scene/Core",
+      scale: new Vector3(10, 10, 10),
+    }),
+    [newComponent(NeuronCoreC, { video })]
+  ),
+  Asset({
+    src,
+    part: "/Scene/Branches",
+    scale: new Vector3(10, 10, 10),
+  }),
+];
 
 (async () => {
   const assetManager = new AssetManager();
 
   assetManager
     .addAsset("assets/models/prop_net.glb", "prop_net")
+    .addAsset("assets/models/neuron.glb", "neuron")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -35,10 +58,16 @@ import { StatsSystem } from "./systems/core/StatsSystem";
 
   const camera = Camera(new Vector3(0, 2, 4));
 
+  
   const neurons = Asset({
     src: "assets/models/prop_net.glb",
     scale: new Vector3(10, 10, 10),
   });
+  
+  const neuron = Neuron({
+    src: "assets/models/neuron.glb",
+    video: "assets/videos/jasmin.mp4"
+  })
 
   const hLight = HemisphereLight({ intensity: 1 });
 
@@ -48,7 +77,8 @@ import { StatsSystem } from "./systems/core/StatsSystem";
     .addEntity(camera)
     .addEntity(neurons)
     .addEntity(hLight)
-    .addEntity(cube);
+    .addEntity(cube)
+    .addEntities(neuron);
 
   world
     .registerSystem(
@@ -67,9 +97,8 @@ import { StatsSystem } from "./systems/core/StatsSystem";
     .registerSystem(HemisphereLightSystem)
     .registerSystem(PointLightSystem)
     .registerSystem(MaterialSystem)
-    .registerSystem(CCMaterialSystem);
+    .registerSystem(CCMaterialSystem)
+    .registerSystem(NeuronCoreSystem);
 
   world.init();
-
-  console.log(world);
 })();

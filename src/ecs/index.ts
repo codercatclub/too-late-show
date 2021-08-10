@@ -28,6 +28,7 @@ export interface System {
 export interface WorldLike {
   init(): void;
   addEntity(entity: Entity): this;
+  addEntities(entities: Entity[]): this;
   removeEntity(id: number): this;
   registerSystem(system: System): this;
 }
@@ -41,7 +42,7 @@ export const newEntity = (
 ): Entity =>
   extend({ name, id: generateID(), components: new Map() }, components);
 
-/** Extend givent Entity componets with provided components */
+/** Extend given Entity component with provided components */
 export const extend = (
   entity: Entity,
   components: Component<unknown>[]
@@ -58,7 +59,7 @@ export function newComponent<T>(
   comp: Component<T>,
   newData?: Partial<Component<T>["data"]>
 ): Component<T> {
-  // NOTE (Kirill): Asuming that component data has no nested objects.
+  // NOTE (Kirill): Assuming that component data has no nested objects.
   // Am I doing deep copy right? Mb use JSON.parse(JSON.stringify(object))
   return { type: comp.type, data: { ...comp.data, ...newData } };
 }
@@ -95,7 +96,8 @@ export class World implements WorldLike {
     animations: new Map(),
     objects: new Map(),
     textures: new Map(),
-    sceneData: new Map()
+    sceneData: new Map(),
+    audio: new Map()
   };
   entities: Entity[];
   systems: System[];
@@ -123,6 +125,12 @@ export class World implements WorldLike {
     this.entities.push(entity);
 
     this.systems.forEach((s) => (s.onEntityAdd ? s.onEntityAdd(entity) : null));
+
+    return this;
+  }
+
+  addEntities(entities: Entity[]) {
+    entities.forEach(this.addEntity.bind(this));
 
     return this;
   }
