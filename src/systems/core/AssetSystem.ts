@@ -73,7 +73,7 @@ export const AssetSystem: AssetSystem = {
   },
 
   processEntity: function (ent: Entity) {
-    const { src, part } = getComponent(ent, GLTFModelC);
+    const { src, part, debug } = getComponent(ent, GLTFModelC);
     const { object3d: parent } = getComponent(ent, Object3DC);
 
     if (!this.world) {
@@ -88,6 +88,10 @@ export const AssetSystem: AssetSystem = {
     }
 
     let asset = this.world.assets.objects.get(src);
+
+    if (debug) {
+      console.debug("GLTF Model: ", asset);
+    }
 
     if (!asset) {
       console.warn(`${src} is not found in preloaded assets`);

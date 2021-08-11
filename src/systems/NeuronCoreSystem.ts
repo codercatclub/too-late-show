@@ -21,9 +21,15 @@ export const NeuronCoreSystem: NeuronCoreSystem = {
       var videoEl = document.createElement("video");
 
       videoEl.src = videoSrc;
-      videoEl.muted = true;
-      videoEl.autoplay = true;
+      // videoEl.muted = true;
+      // videoEl.autoplay = true;
       videoEl.loop = true;
+
+      window.addEventListener('keypress', (e) => {
+        if (e.code === "KeyP") {
+          videoEl.play();
+        }
+      });
 
       const mat = new MeshBasicMaterial();
       const texture = new VideoTexture( videoEl )
