@@ -84,6 +84,13 @@ export const MaterialC = {
   },
 };
 
+export const NeuronMaterialC = {
+  type: "NeuronMaterialC",
+  data: {
+    shader: "Neuron",
+  },
+};
+
 export const CCMaterialC = {
   type: "CCMaterialC",
   data: {

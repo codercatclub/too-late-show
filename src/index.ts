@@ -12,11 +12,12 @@ import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Vector3, Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { CCMaterialC, NeuronCoreC } from "./ecs/components";
+import { CCMaterialC, NeuronCoreC, NeuronMaterialC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
 import { CCMaterialSystem } from "./systems/CCMaterialSystem";
+import { NeuronMatSystem } from "./systems/NeuronMatSystem";
 import { AudioSystem } from "./systems/core/AudioSystem";
 import { StandardPrimitiveSystem } from "./systems/core/StandardPrimitiveSystem";
 import { StatsSystem } from "./systems/core/StatsSystem";
@@ -36,18 +37,18 @@ const Neuron = ({ src, video }: Neuron) => [
     }),
     [newComponent(NeuronCoreC, { video })]
   ),
-  Asset({
+    Asset({
     src,
     part: "/Scene/Branches",
     scale: new Vector3(10, 10, 10),
-  }),
+    })
 ];
 
 (async () => {
   const assetManager = new AssetManager();
 
   assetManager
-    .addAsset("assets/models/prop_net.glb", "prop_net")
+    .addAsset("assets/models/prop_net_02.glb", "prop_net")
     .addAsset("assets/models/neuron.glb", "neuron")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
@@ -59,10 +60,10 @@ const Neuron = ({ src, video }: Neuron) => [
   const camera = Camera(new Vector3(0, 2, 4));
 
   
-  const neurons = Asset({
-    src: "assets/models/prop_net.glb",
+  const neurons = extend(Asset({
+    src: "assets/models/prop_net_02.glb",
     scale: new Vector3(10, 10, 10),
-  });
+  }), [newComponent(NeuronMaterialC, {})]);
   
   const neuron = Neuron({
     src: "assets/models/neuron.glb",
@@ -78,7 +79,7 @@ const Neuron = ({ src, video }: Neuron) => [
     .addEntity(neurons)
     .addEntity(hLight)
     .addEntity(cube)
-    .addEntities(neuron);
+    // .addEntities(neuron);
 
   world
     .registerSystem(
@@ -98,7 +99,8 @@ const Neuron = ({ src, video }: Neuron) => [
     .registerSystem(PointLightSystem)
     .registerSystem(MaterialSystem)
     .registerSystem(CCMaterialSystem)
-    .registerSystem(NeuronCoreSystem);
+    .registerSystem(NeuronCoreSystem)
+    .registerSystem(NeuronMatSystem);
 
   world.init();
 })();
