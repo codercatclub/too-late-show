@@ -1,8 +1,15 @@
 import { System } from "../ecs/index";
-import { TransformC, MovingC, Object3DC, NeuronCoreC } from "../ecs/components";
+import { TransformC, Object3DC, NeuronCoreC } from "../ecs/components";
 import { applyQuery } from "../ecs/index";
 import { getComponent } from "./core/utils";
-import { Mesh, MeshBasicMaterial, VideoTexture } from "three";
+import {
+  Color,
+  Mesh,
+  MeshBasicMaterial,
+  MeshPhysicalMaterial,
+  Object3D,
+  VideoTexture,
+} from "three";
 
 interface NeuronCoreSystem extends System {}
 
@@ -15,33 +22,48 @@ export const NeuronCoreSystem: NeuronCoreSystem = {
     this.entities = applyQuery(world.entities, this.queries);
 
     this.entities.forEach((ent, i) => {
-      const { video: videoSrc } = getComponent(ent, NeuronCoreC);
       const { object3d } = getComponent(ent, Object3DC);
 
-      var videoEl = document.createElement("video");
+      const cores: Object3D[] = [];
 
-      videoEl.src = videoSrc;
-      // videoEl.muted = true;
-      // videoEl.autoplay = true;
-      videoEl.loop = true;
-
-      window.addEventListener('keypress', (e) => {
-        if (e.code === "KeyP") {
-          videoEl.play();
+      object3d.traverse((obj) => {
+        if (obj.name.startsWith("core")) {
+          cores.push(obj);
         }
       });
 
-      const mat = new MeshBasicMaterial();
-      const texture = new VideoTexture( videoEl )
+      cores.forEach((core) => {
+        var videoEl = document.createElement("video");
 
-      mat.map = texture;
+        videoEl.src = core.userData.videoSrc;
+        // videoEl.muted = true;
+        // videoEl.autoplay = true;
+        videoEl.loop = true;
 
-      object3d.traverse(obj => {
-        if (obj.type === "Mesh") {
-          const o = obj as Mesh;
-          o.material = mat;
-        }
-      })
+        const texture = new VideoTexture(videoEl);
+
+        window.addEventListener("keypress", (e) => {
+          if (e.code === "KeyP") {
+            videoEl.play();
+          }
+        });
+
+        texture.flipY = false;
+
+        core.traverse((obj) => {
+          if (obj.type === "Mesh") {
+            const o = obj as Mesh;
+            const mat = (o.material as MeshPhysicalMaterial).clone();
+            
+            mat.roughness = 0.3;
+            mat.metalness = 1;
+            mat.reflectivity = 1;
+            mat.emissiveMap = texture;
+
+            o.material = mat;
+          }
+        });
+      });
     });
   },
 
