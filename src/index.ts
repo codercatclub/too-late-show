@@ -2,17 +2,12 @@ import { extend, World, newComponent } from "./ecs/index";
 import { RenderSystem } from "./systems/core/RenderSystem";
 import { Object3DSystem } from "./systems/core/Object3DSystem";
 import { AssetManager } from "./ecs/assetManager";
-import {
-  Asset,
-  Camera,
-  HemisphereLight,
-  StandardPrimitive,
-} from "./ecs/archetypes";
+import { Asset, HemisphereLight, StandardPrimitive } from "./ecs/archetypes";
 import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Vector3, Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { CCMaterialC, NeuronCoreC, NeuronMaterialC } from "./ecs/components";
+import { AnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -22,34 +17,16 @@ import { AudioSystem } from "./systems/core/AudioSystem";
 import { StandardPrimitiveSystem } from "./systems/core/StandardPrimitiveSystem";
 import { StatsSystem } from "./systems/core/StatsSystem";
 import { NeuronCoreSystem } from "./systems/NeuronCoreSystem";
-
-interface Neuron {
-  src: string;
-  video: string;
-}
-
-const Neuron = ({ src, video }: Neuron) => [
-  extend(
-    Asset({
-      src,
-      part: "/Scene/Core",
-      scale: new Vector3(10, 10, 10),
-    }),
-    [newComponent(NeuronCoreC, { video })]
-  ),
-    Asset({
-    src,
-    part: "/Scene/Branches",
-    scale: new Vector3(10, 10, 10),
-    })
-];
+import { GLTFCameraSystem } from "./systems/core/GLTFCameraSystem";
+import { AnimationSystem } from "./systems/core/AnimationSystem";
 
 (async () => {
   const assetManager = new AssetManager();
 
   assetManager
-    .addAsset("assets/models/prop_net_02.glb", "prop_net")
-    .addAsset("assets/models/neuron.glb", "neuron")
+    .addAsset("assets/models/clusters.glb", "clusters")
+    .addAsset("assets/models/cameras.glb", "cameras")
+    .addAsset("assets/models/muscles.glb", "muscles")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -57,35 +34,40 @@ const Neuron = ({ src, video }: Neuron) => [
 
   const world = new World(assetManager.loadedAssets);
 
-  const camera = Camera(new Vector3(0, 2, 4));
+  const cameras = extend(
+    Asset({
+      src: "assets/models/cameras.glb",
+    }),
+    [GLTFCameraC, newComponent(AnimationC, { clipName: "CameraAction.001" })]
+  );
 
-  
-  const neurons = extend(Asset({
-    src: "assets/models/prop_net_02.glb",
-    scale: new Vector3(10, 10, 10),
-  }), [newComponent(NeuronMaterialC, {})]);
-  
-  const neuron = Neuron({
-    src: "assets/models/neuron.glb",
-    video: "assets/videos/jasmin.mp4"
-  })
+  const clusters = extend(
+    Asset({
+      src: "assets/models/clusters.glb",
+    }),
+    [newComponent(NeuronCoreC), newComponent(NeuronMaterialC)]
+  );
+
+  const muscles = Asset({
+    src: "assets/models/muscles.glb",
+  });
 
   const hLight = HemisphereLight({ intensity: 1 });
 
   const cube = StandardPrimitive({});
 
   world
-    .addEntity(camera)
-    .addEntity(neurons)
+    .addEntity(cameras)
+    .addEntity(clusters)
+    .addEntity(muscles)
     .addEntity(hLight)
-    .addEntity(cube)
-    // .addEntities(neuron);
+    .addEntity(cube);
 
   world
     .registerSystem(
       RenderSystem.configure({
         enableShadows: false,
-        // fog: { enabled: true, color: new Color(0xc2d1d1), density: 0.02 },
+        fog: { enabled: true, color: new Color(0x000000), density: 0.02 },
       })
     )
     .registerSystem(Object3DSystem)
@@ -100,7 +82,9 @@ const Neuron = ({ src, video }: Neuron) => [
     .registerSystem(MaterialSystem)
     .registerSystem(CCMaterialSystem)
     .registerSystem(NeuronCoreSystem)
-    .registerSystem(NeuronMatSystem);
+    .registerSystem(NeuronMatSystem)
+    .registerSystem(GLTFCameraSystem)
+    .registerSystem(AnimationSystem);
 
   world.init();
 })();

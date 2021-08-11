@@ -18,6 +18,7 @@ interface AssetArchetype {
   position?: Vector3;
   rotation?: Vector3;
   scale?: Vector3;
+  debug?: boolean;
 }
 
 export const Asset = ({
@@ -26,9 +27,10 @@ export const Asset = ({
   position = new Vector3(),
   rotation = new Vector3(),
   scale = new Vector3(1, 1, 1),
+  debug = false,
 }: AssetArchetype): Entity =>
   newEntity([
-    newComponent(GLTFModelC, { src, part }),
+    newComponent(GLTFModelC, { src, part, debug }),
     newComponent(TransformC, { position, rotation, scale }),
     newComponent(Object3DC),
   ]);
