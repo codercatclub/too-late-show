@@ -25,25 +25,20 @@ interface NeuronMatSystem extends System {
   processEntity: (ent: Entity) => void;
   clusterData: ClusterData[];
   updateUniforms: (time: number, timeDelta: number) => void;
-  camera: PerspectiveCamera;
+  lastCameraPosition: Vector3;
 }
 
 export const NeuronMatSystem: NeuronMatSystem = {
   type: "NeuronMatSystem",
   world: null,
   clusterData: [],
-  camera: new PerspectiveCamera(),
+  lastCameraPosition: new Vector3(),
   queries: [TransformC, Object3DC, NeuronMaterialC],
 
   init: function (world) {
     this.world = world;
     this.entities = applyQuery(world.entities, this.queries);
     this.entities.forEach(this.processEntity.bind(this));
-
-    const renderSystem = world.getSystem<RenderSystem>(RenderSystem.type);
-    if (renderSystem?.camera) {
-      this.camera = renderSystem.camera;
-    }
   },
 
   processEntity: function (ent) {
@@ -54,6 +49,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
       playT: { type: "f", value: 0 },
+      cameraMove: { type: "f", value: 0 },
     };
     let materialOptions = {};
 
@@ -62,7 +58,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        if (!o.name.includes("core")) {
+        // if (!o.name.includes("core")) {
 
           let clusterData: ClusterData = {
             corePos: new Vector3(),
@@ -86,7 +82,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
           };
 
           o.material = material;
-        }
+        // }
       }
     });
 
@@ -106,10 +102,13 @@ export const NeuronMatSystem: NeuronMatSystem = {
     let cameraPos = new Vector3();
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
     let cam = renderSystem?.camera?.parent;
+    let cameraMove = 0;
     if(cam) {
       cameraPos = cam.position;
+      cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
+      this.lastCameraPosition.copy(cameraPos);
     }
-    this.clusterData.forEach((clusterData, idx) => {
+    this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
         let distFromCam = cameraPos.distanceTo(clusterData.corePos);
         if (distFromCam < 10.0 && clusterData.playT < 0) {
@@ -129,6 +128,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;
+        clusterData.shader.uniforms["cameraMove"].value = cameraMove;
       }
     });
   },
