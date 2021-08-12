@@ -6,26 +6,44 @@ import {
   Mesh,
   UniformsUtils,
   MeshPhongMaterial,
+  Vector3,
+  Shader,
+  Camera,
+  PerspectiveCamera,
 } from "three";
 import { getComponent } from "./core/utils";
+import { RenderSystem } from "./core/RenderSystem";
+
+interface ClusterData {
+  corePos: Vector3;
+  shader: Shader | null;
+  playT: number;
+}
 
 interface NeuronMatSystem extends System {
   world: World | null;
   processEntity: (ent: Entity) => void;
-  materials: THREE.Shader[];
+  clusterData: ClusterData[];
   updateUniforms: (time: number, timeDelta: number) => void;
+  camera: PerspectiveCamera;
 }
 
 export const NeuronMatSystem: NeuronMatSystem = {
   type: "NeuronMatSystem",
   world: null,
-  materials: [],
+  clusterData: [],
+  camera: new PerspectiveCamera(),
   queries: [TransformC, Object3DC, NeuronMaterialC],
 
   init: function (world) {
     this.world = world;
     this.entities = applyQuery(world.entities, this.queries);
     this.entities.forEach(this.processEntity.bind(this));
+
+    const renderSystem = world.getSystem<RenderSystem>(RenderSystem.type);
+    if (renderSystem?.camera) {
+      this.camera = renderSystem.camera;
+    }
   },
 
   processEntity: function (ent) {
@@ -35,28 +53,40 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
+      playT: { type: "f", value: 0 },
     };
     let materialOptions = {};
 
-    const material = new MeshPhongMaterial(materialOptions);
-
-    material.onBeforeCompile = (mshader) => {
-      mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
-      mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
-      mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
-      this.materials.push(mshader);
-    };
 
     parent?.traverse((obj) => {
+
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        console.log(o)
-        o.material = material;
-      }
-      if (obj.type === "SkinnedMesh") {
-        const o = obj as SkinnedMesh;
-        o.material = material;
-        material.skinning = true;
+        if (!o.name.includes("core")) {
+
+          let clusterData: ClusterData = {
+            corePos: new Vector3(),
+            shader: null,
+            playT: -1,
+          }
+
+          if(o.parent)
+          {
+            clusterData.corePos = o.parent.position;
+          }
+
+          const material = new MeshPhongMaterial(materialOptions);
+
+          material.onBeforeCompile = (mshader) => {
+            mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
+            mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
+            mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
+            clusterData.shader = mshader;
+            this.clusterData.push(clusterData);
+          };
+
+          o.material = material;
+        }
       }
     });
 
@@ -72,9 +102,34 @@ export const NeuronMatSystem: NeuronMatSystem = {
     entities.forEach(this.processEntity.bind(this));
   },
 
-  updateUniforms: function (time) {
-    this.materials.forEach((mat) => {
-      mat.uniforms["timeMSec"].value = time;
+  updateUniforms: function (time, timeDelta) {
+    let cameraPos = new Vector3();
+    const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
+    let cam = renderSystem?.camera?.parent;
+    if(cam) {
+      cameraPos = cam.position;
+    }
+    this.clusterData.forEach((clusterData, idx) => {
+      if (clusterData.shader) {
+        let distFromCam = cameraPos.distanceTo(clusterData.corePos);
+        if (distFromCam < 10.0 && clusterData.playT < 0) {
+          //turn on
+          clusterData.playT = 0;
+        }
+        if (clusterData.playT >= 0) {
+          clusterData.playT += timeDelta / 5;
+        }
+        //final clamp and turn off
+        if (clusterData.playT >= 1) {
+          clusterData.playT = -1;
+        }
+
+        //shader activation is first 0.1
+        let playT = clusterData.playT > 0 ? Math.min(10.0 * clusterData.playT, 1) : 1;
+
+        clusterData.shader.uniforms["playT"].value = playT;
+        clusterData.shader.uniforms["timeMSec"].value = time;
+      }
     });
   },
 

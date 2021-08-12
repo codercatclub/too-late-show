@@ -7,7 +7,7 @@ import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Vector3, Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { AnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC } from "./ecs/components";
+import { ScrollAnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -19,6 +19,7 @@ import { StatsSystem } from "./systems/core/StatsSystem";
 import { NeuronCoreSystem } from "./systems/NeuronCoreSystem";
 import { GLTFCameraSystem } from "./systems/core/GLTFCameraSystem";
 import { AnimationSystem } from "./systems/core/AnimationSystem";
+import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
 
 (async () => {
   const assetManager = new AssetManager();
@@ -38,7 +39,7 @@ import { AnimationSystem } from "./systems/core/AnimationSystem";
     Asset({
       src: "assets/models/cameras.glb",
     }),
-    [GLTFCameraC, newComponent(AnimationC, { clipName: "CameraAction.001" })]
+    [GLTFCameraC, newComponent(ScrollAnimationC)]
   );
 
   const clusters = extend(
@@ -84,7 +85,8 @@ import { AnimationSystem } from "./systems/core/AnimationSystem";
     .registerSystem(NeuronCoreSystem)
     .registerSystem(NeuronMatSystem)
     .registerSystem(GLTFCameraSystem)
-    .registerSystem(AnimationSystem);
+    .registerSystem(AnimationSystem)
+    .registerSystem(ScrollAnimationSystem);
 
   world.init();
 })();

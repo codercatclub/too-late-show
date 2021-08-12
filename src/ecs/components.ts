@@ -39,6 +39,11 @@ export const CamC = {
   },
 };
 
+export const ScrollAnimationC = {
+  type: "ScrollAnimationC",
+  data: null,
+};
+
 export const GeometryC = {
   type: "GeometryC",
   data: {
