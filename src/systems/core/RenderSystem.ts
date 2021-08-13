@@ -53,12 +53,13 @@ export const RenderSystem: RenderSystem = {
     this.systems = world.systems.filter((s) => s.type !== "RenderSystem");
 
     this.scene = world.scene;
-
+    
     if (this.fog.enabled && this.scene) {
       this.scene.fog = new THREE.FogExp2(
         this.fog.color.getHex(),
         this.fog.density
       );
+      this.scene.background = this.fog.color;
     }
 
     // TODO

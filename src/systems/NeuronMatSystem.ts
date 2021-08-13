@@ -10,6 +10,7 @@ import {
   Shader,
   Camera,
   PerspectiveCamera,
+  Color
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
@@ -27,6 +28,12 @@ interface NeuronMatSystem extends System {
   updateUniforms: (time: number, timeDelta: number) => void;
   lastCameraPosition: Vector3;
 }
+
+const colorList = [
+  new Color("#ff2009"),
+  new Color("#56ff00"),
+  new Color("#ff0b5d")
+]
 
 export const NeuronMatSystem: NeuronMatSystem = {
   type: "NeuronMatSystem",
@@ -50,16 +57,18 @@ export const NeuronMatSystem: NeuronMatSystem = {
       timeMSec: { type: "f", value: 0 },
       playT: { type: "f", value: 0 },
       cameraMove: { type: "f", value: 0 },
+      fresnelColor: { type: "color", value: new Color("#56ff00") },
     };
-    let materialOptions = {};
+    let materialOptions = {
+      transparent: true
+    };
 
 
     parent?.traverse((obj) => {
 
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        // if (!o.name.includes("core")) {
-
+        //if (!o.name.includes("core")) {
           let clusterData: ClusterData = {
             corePos: new Vector3(),
             shader: null,
@@ -77,6 +86,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
             mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
             mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
             mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
+            let i = parseInt(o.name[o.name.length - 1]) % colorList.length;
+            if(!i) {
+              i = 0;
+            }
+            mshader.uniforms.fresnelColor.value = colorList[i];
             clusterData.shader = mshader;
             this.clusterData.push(clusterData);
           };
