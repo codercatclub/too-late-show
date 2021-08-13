@@ -1,6 +1,10 @@
 import * as THREE from "three";
 import { Color, PerspectiveCamera } from "three";
 import { System } from "../../ecs/index";
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { SSAARenderPass } from 'three/examples/jsm/postprocessing/SSAARenderPass.js';
 
 interface RenderSystemConfig {
   enableShadows: boolean;
@@ -22,6 +26,8 @@ export interface RenderSystem extends System, RenderSystemConfig {
   setCamera(cam: PerspectiveCamera): void;
 }
 
+let set = false;
+let composer: EffectComposer = new EffectComposer(new THREE.WebGLRenderer());
 export const RenderSystem: RenderSystem = {
   type: "RenderSystem",
   camera: null,
@@ -72,7 +78,7 @@ export const RenderSystem: RenderSystem = {
 
     this.camera.position.set(0, 0, 1);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: false });
 
     this.renderer.physicallyCorrectLights = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -97,6 +103,25 @@ export const RenderSystem: RenderSystem = {
   animation: function () {
     if (!this.clock || !this.scene || !this.camera || !this.renderer) return;
 
+
+    if (!set) {
+      set = true;
+      const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+      const renderScene = new RenderPass(this.scene, this.camera);
+      var ssaaRenderPass = new SSAARenderPass( this.scene, this.camera, 0, 0);
+      ssaaRenderPass.sampleLevel = 4;
+      ssaaRenderPass.unbiased = true;
+
+      composer = new EffectComposer(this.renderer);
+      composer.addPass(renderScene);
+      bloomPass.threshold = 0.2;
+      bloomPass.strength = 1.5;
+      bloomPass.radius = 0.0;
+      //composer.addPass(ssaaRenderPass);
+      // composer.addPass(bloomPass);
+      bloomPass.renderToScreen = true;
+    }
+
     const delta = this.clock.getDelta();
     const elapsedTime = this.clock.elapsedTime;
 
@@ -104,7 +129,7 @@ export const RenderSystem: RenderSystem = {
 
     this.tick(elapsedTime, delta);
 
-    this.renderer.render(this.scene, this.camera);
+    composer.render();
 
     this.onFrameEnd(elapsedTime, delta);
   },

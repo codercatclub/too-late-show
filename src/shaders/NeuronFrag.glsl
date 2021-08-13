@@ -20,5 +20,5 @@ void main() {
   vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
   finalColor += glitchColor;
   
-  gl_FragColor = vec4(finalColor, 1.0);
+  gl_FragColor = vec4(vNormal.r * finalColor, 1.0);
 }

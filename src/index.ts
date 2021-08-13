@@ -68,7 +68,7 @@ import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
     .registerSystem(
       RenderSystem.configure({
         enableShadows: false,
-        fog: { enabled: true, color: new Color(0x000000), density: 0.02 },
+        fog: { enabled: true, color: new Color(0x000000), density: 0.01 },
       })
     )
     .registerSystem(Object3DSystem)
