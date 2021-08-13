@@ -67,7 +67,7 @@ varying vec3 vWorldPos;
 
 varying float vReflectionFactor;
 
-@import ./PerlinNoise;
+@import ./NoiseFx;
 
 void main() {
 

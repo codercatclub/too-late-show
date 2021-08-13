@@ -13,8 +13,6 @@ uniform vec3 fresnelColor;
 void main() {
   vec3 finalColor = fresnelColor;
   gl_FragColor = vec4(finalColor, vReflectionFactor);
-
-
   gl_FragColor.rgb += 0.5 * vReflectionFactor * vNormal;
   #include <fog_fragment>
 
