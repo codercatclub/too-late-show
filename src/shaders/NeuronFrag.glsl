@@ -2,6 +2,7 @@ varying vec3 vNormal;
 varying vec3 vWorldPos;
 varying float vDist;
 varying float vReflectionFactor;
+varying float glitchFactor;
 
 
 uniform float timeMSec;
@@ -18,10 +19,9 @@ void main() {
 	);
 	
   vec3 finalColor = fresnelColor * vReflectionFactor;
-  vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
+  vec3 glitchColor = cameraMove * pow(glitchFactor, 12.0) * fractBy3;
   finalColor += glitchColor;
   
   gl_FragColor = vec4(finalColor, vReflectionFactor + 0.5);
-
   #include <fog_fragment>
 }

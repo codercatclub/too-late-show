@@ -7,6 +7,8 @@ varying vec3 vNormal;
 varying float vDist;
 varying vec3 vWorldPos;
 varying float vReflectionFactor;
+varying float glitchFactor;
+
  #include <fog_pars_vertex>
 void main(){
   vNormal = normal;
@@ -19,8 +21,7 @@ void main(){
 
   vDist = color.r;
 
-  vec4 mvPosition = viewMatrix * worldPos;
-  gl_Position = projectionMatrix * mvPosition;
+
 
 
   //FRESNEL
@@ -31,5 +32,16 @@ void main(){
   float mFresnelScale = 2.1;
   float mFresnelPower = 3.1;
   vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower );
+  glitchFactor = vReflectionFactor;
+  float x = smoothstep(60.0,150.0,length(I));
+  vReflectionFactor += x;
+  vReflectionFactor = min(vReflectionFactor, 1.0);
+  worldPos.xyz += 0.08 * x * worldNormal;
+  
+  vec4 mvPosition = viewMatrix * worldPos;
+  gl_Position = projectionMatrix * mvPosition;
+
   #include <fog_vertex>
+
+
 }
