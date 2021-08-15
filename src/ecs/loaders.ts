@@ -20,7 +20,7 @@ const fileLoader = new FileLoader();
 const audioLoader = new AudioLoader();
 
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+dracoLoader.setDecoderPath("assets/libs/draco/");
 gltfLoader.setDRACOLoader(dracoLoader);
 
 const ktx2Loader = new KTX2Loader();
