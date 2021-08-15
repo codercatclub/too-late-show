@@ -21,6 +21,7 @@ interface ClusterData {
   corePos: Vector3;
   shader: Shader | null;
   playT: number;
+  videoEl: HTMLVideoElement | null;
 }
 
 interface NeuronMatSystem extends System {
@@ -78,6 +79,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
             corePos: new Vector3(),
             shader: null,
             playT: -1,
+            videoEl: null,
           }
 
           if(o.parent)
@@ -90,12 +92,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
             var videoEl = document.createElement("video");
             // videoEl.src = o.userData.videoSrc;
             videoEl.src = "assets/videos/jasmin.mp4";
-            // videoEl.muted = true;
-            videoEl.autoplay = true;
-            videoEl.loop = true;
+            //videoEl.loop = true;
     
             const texture = new VideoTexture(videoEl);
             material.map = texture;
+            clusterData.videoEl = videoEl;
           }
           material.onBeforeCompile = (mshader) => {
             mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
@@ -147,6 +148,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
         if (distFromCam < 10.0 && clusterData.playT < 0) {
           //turn on
           clusterData.playT = 0;
+          if(clusterData.videoEl) {
+            clusterData.videoEl.pause();
+            clusterData.videoEl.currentTime = 0;
+            clusterData.videoEl.play();
+          }
         }
         if (clusterData.playT >= 0) {
           clusterData.playT += timeDelta / 5;
