@@ -10,6 +10,10 @@ varying float vReflectionFactor;
 varying float glitchFactor;
 
  #include <fog_pars_vertex>
+
+ #ifdef USE_MAP
+	varying vec2 vUv;
+#endif
 void main(){
   vNormal = normal;
   vec4 worldPos = modelMatrix * vec4(position, 1.0);
@@ -21,7 +25,9 @@ void main(){
 
   vDist = color.r;
 
-
+ #ifdef USE_MAP
+	vUv = uv;
+#endif
 
 
   //FRESNEL

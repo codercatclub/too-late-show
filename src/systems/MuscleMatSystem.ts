@@ -23,6 +23,7 @@ interface MuscleMatSystem extends System {
   clusterData: ClusterData[];
   updateUniforms: (time: number, timeDelta: number) => void;
   lastCameraPosition: Vector3;
+  lerpCameraMove: number;
 }
 
 const colorList = [
@@ -34,6 +35,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
   world: null,
   clusterData: [],
   lastCameraPosition: new Vector3(),
+  lerpCameraMove: 0,
   queries: [TransformC, Object3DC, MuscleMaterialC],
 
   init: function (world) {
@@ -104,12 +106,16 @@ export const MuscleMatSystem: MuscleMatSystem = {
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
+      this.lerpCameraMove = 0.7 * this.lerpCameraMove + 0.3 * cameraMove;
+      if(this.lerpCameraMove < 0.005) {
+        this.lerpCameraMove = 0;
+      }
       this.lastCameraPosition.copy(cameraPos);
     }
     this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
         clusterData.shader.uniforms["timeMSec"].value = time;
-        clusterData.shader.uniforms["cameraMove"].value = cameraMove;
+        clusterData.shader.uniforms["cameraMove"].value = this.lerpCameraMove;
       }
     });
   },

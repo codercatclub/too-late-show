@@ -10,7 +10,9 @@ import {
   Shader,
   Camera,
   PerspectiveCamera,
-  Color
+  Color,
+  VideoTexture,
+  SpriteMaterial
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
@@ -27,6 +29,7 @@ interface NeuronMatSystem extends System {
   clusterData: ClusterData[];
   updateUniforms: (time: number, timeDelta: number) => void;
   lastCameraPosition: Vector3;
+  lerpCameraMove: number,
 }
 
 const colorList = [
@@ -41,6 +44,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
   clusterData: [],
   lastCameraPosition: new Vector3(),
   queries: [TransformC, Object3DC, NeuronMaterialC],
+  lerpCameraMove: 0,
 
   init: function (world) {
     this.world = world;
@@ -68,7 +72,8 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        //if (!o.name.includes("core")) {
+
+
           let clusterData: ClusterData = {
             corePos: new Vector3(),
             shader: null,
@@ -81,7 +86,17 @@ export const NeuronMatSystem: NeuronMatSystem = {
           }
 
           const material = new MeshPhongMaterial(materialOptions);
-
+          if (o.name.includes("core")) {
+            var videoEl = document.createElement("video");
+            // videoEl.src = o.userData.videoSrc;
+            videoEl.src = "assets/videos/jasmin.mp4";
+            // videoEl.muted = true;
+            videoEl.autoplay = true;
+            videoEl.loop = true;
+    
+            const texture = new VideoTexture(videoEl);
+            material.map = texture;
+          }
           material.onBeforeCompile = (mshader) => {
             mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
             mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
@@ -96,7 +111,6 @@ export const NeuronMatSystem: NeuronMatSystem = {
           };
 
           o.material = material;
-        // }
       }
     });
 
@@ -120,6 +134,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
     if(cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
+      //cameraMove = cameraMove < 1.0 ? 0.0 : cameraMove;
+      this.lerpCameraMove = 0.3 * this.lerpCameraMove + 0.7 * cameraMove;
+      if(this.lerpCameraMove < 0.005) {
+        this.lerpCameraMove = 0;
+      }
       this.lastCameraPosition.copy(cameraPos);
     }
     this.clusterData.forEach((clusterData) => {
@@ -138,11 +157,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
         }
 
         //shader activation is first 0.1
-        let playT = clusterData.playT > 0 ? Math.min(10.0 * clusterData.playT, 1) : 1;
+        let playT = clusterData.playT > 0 ? Math.min(1.0 * clusterData.playT, 1) : 1;
 
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;
-        clusterData.shader.uniforms["cameraMove"].value = cameraMove;
+        clusterData.shader.uniforms["cameraMove"].value = this.lerpCameraMove;
       }
     });
   },
