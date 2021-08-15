@@ -7,7 +7,9 @@ import {
   Vector3,
   Shader,
   Color,
-  MeshPhysicalMaterial
+  MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  AdditiveBlending
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
@@ -52,38 +54,49 @@ export const MuscleMatSystem: MuscleMatSystem = {
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
       cameraMove: { type: "f", value: 0 },
-      fresnelColor: { type: "color", value: new Color("#56ff00") },
+      fresnelScale: { type: "f", value: 2.5 },
+      fresnelColor: { type: "color", value: new Color("#3238a8") },
     };
 
-    let materialOptions = {
-    };
+
 
 
     parent?.traverse((obj) => {
-
+      console.log(obj.name)
+      if(!(obj.name.includes("cell") || obj.name.includes("muscle") || obj.name.includes("lymps"))) {
+        return;
+      }
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        console.log(o)
         let clusterData: ClusterData = {
           corePos: new Vector3(),
           shader: null,
         }
 
-        if (o.parent) {
-          clusterData.corePos = o.parent.position;
+        let isCell = o.name.includes("cell") || o.name.includes("lymps")
+        let materialOptions = {
+          transparent: isCell
+        };
+        obj.renderOrder = isCell ? 100 : 0;
+        const material = isCell ? new MeshPhysicalMaterial(materialOptions) : new MeshStandardMaterial(materialOptions);
+        
+        const shadername = isCell ? "Cell" : "Muscle";
+
+        if(isCell)
+        {
+          material.blending = AdditiveBlending;
         }
-
-        const material = new MeshPhysicalMaterial(materialOptions);
-
         material.onBeforeCompile = (mshader) => {
           mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
-          mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
-          mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
+          mshader.vertexShader = require(`../shaders/${shadername}Vert.glsl`);
+          mshader.fragmentShader = require(`../shaders/${shadername}Frag.glsl`);
           let i = parseInt(o.name[o.name.length - 1]) % colorList.length;
           if (!i) {
             i = 0;
           }
-          mshader.uniforms.fresnelColor.value = colorList[i];
+          if(o.name.includes("cell")) {
+            mshader.uniforms.fresnelScale.value = 0.5;
+          }
           clusterData.shader = mshader;
           this.clusterData.push(clusterData);
         };

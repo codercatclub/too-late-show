@@ -18,8 +18,8 @@ void main(){
   vNormal = normal;
   vec4 worldPos = modelMatrix * vec4(position, 1.0);
 
-  worldPos.x += 2.0 * cameraMove * sin(0.01*timeMSec);
-  worldPos.z += 3.0 * cameraMove * cos(0.1 + 0.02*timeMSec + worldPos.x);
+  worldPos.x += 2.0 * cameraMove * sin(0.01*cameraMove);
+  worldPos.z += 3.0 * cameraMove * cos(0.1 + 0.02*cameraMove + worldPos.x);
 
   vWorldPos = worldPos.xyz;
 

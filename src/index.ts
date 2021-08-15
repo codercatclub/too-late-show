@@ -47,7 +47,7 @@ import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
     Asset({
       src: "assets/models/clusters.glb",
     }),
-    [newComponent(NeuronMaterialC)]
+    [newComponent(NeuronMaterialC), newComponent(MuscleMaterialC)]
   );
 
   const muscles = extend(
