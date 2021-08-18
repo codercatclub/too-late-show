@@ -62,7 +62,6 @@ export const MuscleMatSystem: MuscleMatSystem = {
 
 
     parent?.traverse((obj) => {
-      console.log(obj.name)
       if(!(obj.name.includes("cell") || obj.name.includes("muscle") || obj.name.includes("lymps"))) {
         return;
       }

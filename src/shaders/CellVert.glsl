@@ -28,9 +28,8 @@ void main(){
   vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normalize(normal) );
   vNormal = worldNormal;
 
-  float mFresnelPower =3.1;
-  vReflectionFactor = fresnelScale*pow(dot( normalize( I ), worldNormal ), mFresnelPower );
-
+  float mFresnelPower = 3.1;
+  vReflectionFactor = pow( abs(dot( normalize( I ), worldNormal )), mFresnelPower);
 
  #include <fog_vertex>
 }

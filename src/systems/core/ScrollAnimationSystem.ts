@@ -47,11 +47,9 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
     let removedTutorial = false;
     //get current time by scroll amount
     document.addEventListener("wheel", (event) => {
-      event.preventDefault();
       this.lastDelta = 0.5 * Math.min(Math.max(event.deltaY, -5), 5);
       if (!removedTutorial) {
         let tutorialEl = document.querySelector("cc-tutorial");
-        console.log(tutorialEl)
         tutorialEl?.remove();
         removedTutorial = true;
       }
@@ -60,9 +58,11 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
 
   tick: function (_time, deltaTime) {
     let updateAmt = deltaTime * this.lastDelta;
-    let newScrollTime = this.scrollTime + updateAmt;
-    if (newScrollTime > 3.3) {
-      updateAmt = Math.max(0, 3.3 - this.scrollTime);
+    const newScrollTime = this.scrollTime + updateAmt;
+    const maxScroll = 10;
+
+    if (newScrollTime > maxScroll) {
+      updateAmt = Math.max(0, maxScroll - this.scrollTime);
     }
 
     if (Math.abs(updateAmt) > 0) {

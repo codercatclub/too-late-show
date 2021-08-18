@@ -168,3 +168,8 @@ export const NeuronCoreC: Component<NeuronCoreCData> = {
     video: ""
   }
 };
+
+export const EnvSphereC: Component<null> = {
+  type: "NeuronCore",
+  data: null,
+};

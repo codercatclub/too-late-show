@@ -7,7 +7,7 @@ import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Vector3, Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { ScrollAnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC, MuscleMaterialC } from "./ecs/components";
+import { ScrollAnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC, MuscleMaterialC, EnvSphereC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -21,6 +21,7 @@ import { NeuronCoreSystem } from "./systems/NeuronCoreSystem";
 import { GLTFCameraSystem } from "./systems/core/GLTFCameraSystem";
 import { AnimationSystem } from "./systems/core/AnimationSystem";
 import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
+import { EnvSphereSystem } from "./systems/EnvSphereSystem";
 
 (async () => {
   const assetManager = new AssetManager();
@@ -29,6 +30,8 @@ import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
     .addAsset("assets/models/clusters.glb", "clusters")
     .addAsset("assets/models/cameras.glb", "cameras")
     .addAsset("assets/models/muscles.glb", "muscles")
+    .addAsset("assets/models/env_neurons.glb", "env_neurons")
+    .addAsset("assets/models/env.glb", "env")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -57,10 +60,26 @@ import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
     [newComponent(MuscleMaterialC)]
   );
 
+  const env = extend(
+    Asset({
+      src: "assets/models/env.glb",
+    }),
+    [newComponent(EnvSphereC)]
+  );
+
+  const env_neurons = extend(
+    Asset({
+      src: "assets/models/env_neurons.glb",
+    }),
+    [newComponent(MuscleMaterialC)]
+  );
+
   world
     .addEntity(cameras)
     .addEntity(clusters)
     .addEntity(muscles)
+    .addEntity(env)
+    .addEntity(env_neurons)
 
   world
     .registerSystem(
@@ -85,7 +104,8 @@ import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
     .registerSystem(MuscleMatSystem)
     .registerSystem(GLTFCameraSystem)
     .registerSystem(AnimationSystem)
-    .registerSystem(ScrollAnimationSystem);
+    .registerSystem(ScrollAnimationSystem)
+    .registerSystem(EnvSphereSystem)
 
   world.init();
 })();
