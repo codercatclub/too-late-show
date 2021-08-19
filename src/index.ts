@@ -79,13 +79,13 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .addEntity(clusters)
     .addEntity(muscles)
     .addEntity(env)
-    .addEntity(env_neurons)
+    // .addEntity(env_neurons)
 
   world
     .registerSystem(
       RenderSystem.configure({
         enableShadows: false,
-        fog: { enabled: true, color: new Color("#000619"), density: 0.01 },
+        fog: { enabled: true, color: new Color("#0f1e33"), density: 0.01 },
       })
     )
     .registerSystem(Object3DSystem)
