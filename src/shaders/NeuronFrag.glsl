@@ -3,7 +3,7 @@ varying vec3 vWorldPos;
 varying float vDist;
 varying float vReflectionFactor;
 varying float glitchFactor;
-
+varying float decay;
 
 uniform float timeMSec;
 uniform float playT;
@@ -21,6 +21,27 @@ vec3 generic_desaturate(vec3 color, float factor)
 	vec3 lum = vec3(0.299, 0.587, 0.114);
 	vec3 gray = vec3(dot(lum, color));
 	return mix(color, gray, factor);
+}
+
+vec3 spectral_jet(float w)
+{
+	w = 400.0 + 300.0 * w;
+    // w: [0, 1]
+	// x: [0,   1]
+	float x = saturate((w - 400.0)/ 300.0);
+	vec3 c;
+
+	if (x < 0.25)
+		c = vec3(0.0, 4.0 * x, 1.0);
+	else if (x < 0.5)
+		c = vec3(0.0, 1.0, 1.0 + 4.0 * (0.25 - x));
+	else if (x < 0.75)
+		c = vec3(4.0 * (x - 0.5), 1.0, 0.0);
+	else
+		c = vec3(1.0, 1.0 + 4.0 * (0.75 - x), 0.0);
+
+	// Clamp colour components in [0,1]
+	return saturate(c);
 }
 
 void main() {
@@ -52,6 +73,11 @@ void main() {
   vec3 glitchColor = cameraMove * pow(glitchFactor, 12.0) * fractBy3;
   finalColor.rgb += glitchColor;
   finalColor.rgb += 10.0 * brightness * fresnelColor;
+
+  float m = glitchFactor + 0.3 * sin(3.0*vWorldPos.x) + 0.2 * cos(4.0*vWorldPos.y);
+
+  float r = smoothstep (0.5, 1.0, floor(7.0 * m - 2.0)/7.0 );
+  finalColor.rgb += decay * step(0.001,r) * spectral_jet(r);
   
   gl_FragColor = finalColor;
 
