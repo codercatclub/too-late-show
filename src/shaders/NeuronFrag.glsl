@@ -70,7 +70,7 @@ void main() {
 		floor(fract(7. * timeMSec+0.3) + 0.5),
 		floor(fract(7. * timeMSec+0.6) + 0.5)
 	);
-  vec3 glitchColor = cameraMove * pow(glitchFactor, 12.0) * fractBy3;
+  vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
   finalColor.rgb += glitchColor;
   finalColor.rgb += 10.0 * brightness * fresnelColor;
 
