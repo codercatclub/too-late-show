@@ -34,9 +34,9 @@ interface NeuronMatSystem extends System {
 }
 
 const colorList = [
-  new Color("#ff2009"),
-  new Color("#56ff00"),
-  new Color("#ff0b5d")
+  new Color("#ff0942"),
+  new Color("#00a8a3"),
+  new Color("#5d00ff")
 ]
 
 export const NeuronMatSystem: NeuronMatSystem = {
