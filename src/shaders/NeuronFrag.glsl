@@ -72,7 +72,7 @@ void main() {
 	);
   vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
   finalColor.rgb += glitchColor;
-  finalColor.rgb += 10.0 * brightness * fresnelColor;
+  finalColor.rgb += 100.0 * brightness * fresnelColor;
 
   float m = glitchFactor + 0.3 * sin(3.0*vWorldPos.x) + 0.2 * cos(4.0*vWorldPos.y);
 
