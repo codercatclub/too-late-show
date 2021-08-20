@@ -11,7 +11,7 @@ void main() {
   float freq = 0.00012;
 
   vec3 scrollingPos = vec3(vPos.x, vPos.y, vPos.z + time/100.0);
-  float noise = cnoise(scrollingPos * 4.0) + 0.2;
+  float noise = 0.5 + cnoise(scrollingPos * 2.0);
 
   gl_FragColor = vec4(mix(env_c1, env_c2, noise), 1.0);
 }
