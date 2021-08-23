@@ -35,7 +35,7 @@ void main(){
   float mFresnelBias = 0.5;
   float mFresnelScale = 2.1;
   float mFresnelPower = 2.1;
-  vReflectionFactor = mFresnelBias + mFresnelScale * pow( abs(dot( normalize( I ), worldNormal )), mFresnelPower );
+  vReflectionFactor = mFresnelBias + mFresnelScale * abs(pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower ));
 
 
  #include <fog_vertex>

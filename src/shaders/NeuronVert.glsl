@@ -8,6 +8,7 @@ varying float vDist;
 varying vec3 vWorldPos;
 varying float vReflectionFactor;
 varying float glitchFactor;
+varying float decay;
 
  #include <fog_pars_vertex>
 
@@ -41,6 +42,7 @@ void main(){
   glitchFactor = vReflectionFactor;
   float x = smoothstep(60.0,150.0,length(I));
   vReflectionFactor += x;
+  decay = 1.0 - smoothstep(10.0,20.0,length(I));;
   vReflectionFactor = min(vReflectionFactor, 1.0);
   worldPos.xyz += 0.08 * x * worldNormal;
   
