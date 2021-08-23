@@ -7,7 +7,7 @@ import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Vector3, Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { ScrollAnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC, MuscleMaterialC, EnvSphereC } from "./ecs/components";
+import { ScrollAnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC, MuscleMaterialC, EnvSphereC, AnimationC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -32,6 +32,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .addAsset("assets/models/muscles.glb", "muscles")
     .addAsset("assets/models/env_neurons.glb", "env_neurons")
     .addAsset("assets/models/env.glb", "env")
+    .addAsset("assets/models/track.glb", "track")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -44,6 +45,13 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
       src: "assets/models/cameras.glb",
     }),
     [GLTFCameraC, newComponent(ScrollAnimationC)]
+  );
+
+  const track = extend(
+    Asset({
+      src: "assets/models/track.glb",
+    }),
+    [AnimationC]
   );
 
   const clusters = extend(
@@ -79,7 +87,8 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .addEntity(clusters)
     .addEntity(muscles)
     .addEntity(env)
-    .addEntity(env_neurons)
+    .addEntity(track)
+    // .addEntity(env_neurons)
 
   world
     .registerSystem(

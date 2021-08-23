@@ -26,17 +26,19 @@ export const AnimationSystem: AnimationSystem = {
       const { object3d } = getComponent(ent, Object3DC);
       const { clipName } = getComponent(ent, AnimationC);
 
-      const animClips = world.assets.animations.get(src);
+      let animClips = world.assets.animations.get(src);
 
       const mixer = new AnimationMixer(object3d);
 
       this.mixers.set(src, mixer);
 
-      animClips
-        ?.filter((c) => c.name === clipName)
-        .forEach((clip) => {
-          mixer.clipAction(clip).play();
-        });
+      if (clipName) {
+        animClips = animClips?.filter((c) => c.name === clipName);
+      }
+
+      animClips?.forEach((clip) => {
+        mixer.clipAction(clip).play();
+      });
     });
   },
 
