@@ -119,6 +119,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
+      cameraMove = cameraMove < 2.0 ? 0.0 : cameraMove;
       this.lerpCameraMove = 0.7 * this.lerpCameraMove + 0.3 * cameraMove;
       if(this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
