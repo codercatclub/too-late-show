@@ -62,7 +62,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
 
 
     parent?.traverse((obj) => {
-      if(!(obj.name.includes("cell") || obj.name.includes("muscle") || obj.name.includes("lymps"))) {
+      if(!(obj.name == "Spark" || obj.name.includes("cell") || obj.name.includes("muscle") || obj.name.includes("lymps"))) {
         return;
       }
       if (obj.type === "Mesh") {
@@ -72,7 +72,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
           shader: null,
         }
 
-        let isCell = o.name.includes("cell") || o.name.includes("lymps")
+        let isCell = o.name.includes("cell") || o.name.includes("lymps") || obj.name.includes("Spark")
         let materialOptions = {
           transparent: isCell
         };

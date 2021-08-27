@@ -51,7 +51,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     Asset({
       src: "assets/models/track.glb",
     }),
-    [newComponent(NeuronMaterialC)]
+    [newComponent(NeuronMaterialC), newComponent(MuscleMaterialC), newComponent(ScrollAnimationC)]
   );
 
   const clusters = extend(
