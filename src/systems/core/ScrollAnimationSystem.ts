@@ -58,7 +58,7 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
 
   tick: function (_time, deltaTime) {
     //if autoscroll
-    // this.lastDelta = 1;
+    //this.lastDelta = 0.2;
     let updateAmt = deltaTime * this.lastDelta;
     const newScrollTime = this.scrollTime + updateAmt;
     const maxScroll = 7.4;
