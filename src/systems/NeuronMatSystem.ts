@@ -12,7 +12,8 @@ import {
   PerspectiveCamera,
   Color,
   VideoTexture,
-  SpriteMaterial
+  SpriteMaterial,
+  Object3D
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
@@ -22,6 +23,7 @@ interface ClusterData {
   shader: Shader | null;
   playT: number;
   videoEl: HTMLVideoElement | null;
+  index: number;
 }
 
 interface NeuronMatSystem extends System {
@@ -31,6 +33,7 @@ interface NeuronMatSystem extends System {
   updateUniforms: (time: number, timeDelta: number) => void;
   lastCameraPosition: Vector3;
   lerpCameraMove: number,
+  spark: Object3D;
 }
 
 const colorList = [
@@ -39,6 +42,8 @@ const colorList = [
   new Color("#5d00ff")
 ]
 
+let clipDurations: number[] = []
+
 export const NeuronMatSystem: NeuronMatSystem = {
   type: "NeuronMatSystem",
   world: null,
@@ -46,6 +51,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
   lastCameraPosition: new Vector3(),
   queries: [TransformC, Object3DC, NeuronMaterialC],
   lerpCameraMove: 0,
+  spark: new Object3D(),
 
   init: function (world) {
     this.world = world;
@@ -70,7 +76,9 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
 
     parent?.traverse((obj) => {
-
+      if(obj.name == "Spark") {
+        this.spark = obj;
+      }
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
 
@@ -80,6 +88,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
             shader: null,
             playT: -1,
             videoEl: null,
+            index: 0
           }
 
           if(o.parent)
@@ -88,6 +97,12 @@ export const NeuronMatSystem: NeuronMatSystem = {
           }
 
           const material = new MeshPhongMaterial(materialOptions);
+
+          let i = parseInt(o.name[o.name.length - 1]);
+          if(!i) {
+            i = 0;
+          }
+          clusterData.index = i;
           if (o.name.includes("core")) {
             var videoEl = document.createElement("video");
             // videoEl.src = o.userData.videoSrc;
@@ -102,11 +117,8 @@ export const NeuronMatSystem: NeuronMatSystem = {
             mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
             mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
             mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
-            let i = parseInt(o.name[o.name.length - 1]) % colorList.length;
-            if(!i) {
-              i = 0;
-            }
-            mshader.uniforms.fresnelColor.value = colorList[i];
+            let colorIdx = clusterData.index % colorList.length;
+            mshader.uniforms.fresnelColor.value = colorList[colorIdx];
             clusterData.shader = mshader;
             this.clusterData.push(clusterData);
           };
@@ -144,8 +156,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
     }
     this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
-        let distFromCam = cameraPos.distanceTo(clusterData.corePos);
-        if (distFromCam < 10.0 && clusterData.playT < 0) {
+        if(clusterData.videoEl) { 
+          clipDurations[clusterData.index] = clusterData.videoEl.duration;
+        }
+        let distFromCam = this.spark.position.distanceTo(clusterData.corePos);
+        if (distFromCam < 0.5 && clusterData.playT < 0) {
           //turn on
           clusterData.playT = 0;
           if(clusterData.videoEl) {
@@ -155,15 +170,17 @@ export const NeuronMatSystem: NeuronMatSystem = {
           }
         }
         if (clusterData.playT >= 0) {
-          clusterData.playT += timeDelta / 5;
+          clusterData.playT += timeDelta;
         }
+
+        let playTMax = clipDurations[clusterData.index] ? clipDurations[clusterData.index] : 1;
         //final clamp and turn off
-        if (clusterData.playT >= 1) {
+        if (clusterData.playT >= playTMax) {
           clusterData.playT = -1;
         }
 
         //shader activation is first 0.1
-        let playT = clusterData.playT > 0 ? Math.min(1.0 * clusterData.playT, 1) : 1;
+        let playT = clusterData.playT > 0 ? Math.min(0.2 * clusterData.playT, 1) : 1;
 
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;

@@ -1,6 +1,7 @@
 uniform float timeMSec;
 uniform float cameraMove;
 uniform float fresnelScale;
+uniform float idleMove;
 
 attribute vec3 color;
 
@@ -13,9 +14,9 @@ varying float vReflectionFactor;
 void main(){
   vec4 worldPos = modelMatrix * vec4(position, 1.0);
 
-  worldPos.x += 0.1 * sin(0.2*timeMSec + 0.1*worldPos.y);
-  worldPos.z += 0.15 * cos(0.1 + 0.3*timeMSec + 4.0 * worldPos.x);
-  worldPos.y += 0.15 * sin(0.1 + 0.3*timeMSec + worldPos.z);
+  worldPos.x += idleMove * 0.1 * sin(0.2*timeMSec + 0.1*worldPos.y);
+  worldPos.z += idleMove * 0.15 * cos(0.1 + 0.3*timeMSec + 4.0 * worldPos.x);
+  worldPos.y += idleMove * 0.15 * sin(0.1 + 0.3*timeMSec + worldPos.z);
 
   vWorldPos = worldPos.xyz;
 

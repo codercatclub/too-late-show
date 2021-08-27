@@ -56,6 +56,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
       cameraMove: { type: "f", value: 0 },
       fresnelScale: { type: "f", value: 2.5 },
       fresnelColor: { type: "color", value: new Color("#3238a8") },
+      idleMove : {type: "f", value: 1}
     };
 
 
@@ -90,12 +91,11 @@ export const MuscleMatSystem: MuscleMatSystem = {
           mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
           mshader.vertexShader = require(`../shaders/${shadername}Vert.glsl`);
           mshader.fragmentShader = require(`../shaders/${shadername}Frag.glsl`);
-          let i = parseInt(o.name[o.name.length - 1]) % colorList.length;
-          if (!i) {
-            i = 0;
-          }
           if(o.name.includes("cell")) {
             mshader.uniforms.fresnelScale.value = 0.5;
+          }
+          if(o.name.includes("Spark")) {
+            mshader.uniforms.idleMove.value = 0.2;
           }
           clusterData.shader = mshader;
           this.clusterData.push(clusterData);
