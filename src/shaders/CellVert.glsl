@@ -30,7 +30,7 @@ void main(){
   vNormal = worldNormal;
 
   float mFresnelPower = 3.1;
-  vReflectionFactor = pow( abs(dot( normalize( I ), worldNormal )), mFresnelPower);
+  vReflectionFactor = fresnelScale * pow( abs(dot( normalize( I ), worldNormal )), mFresnelPower);
 
  #include <fog_vertex>
 }

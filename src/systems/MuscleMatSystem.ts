@@ -54,7 +54,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
       cameraMove: { type: "f", value: 0 },
-      fresnelScale: { type: "f", value: 2.5 },
+      fresnelScale: { type: "f", value: 1 },
       fresnelColor: { type: "color", value: new Color("#3238a8") },
       idleMove : {type: "f", value: 1}
     };
@@ -96,6 +96,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
           }
           if(o.name.includes("Spark")) {
             mshader.uniforms.idleMove.value = 0.2;
+            mshader.uniforms.fresnelScale.value = 3;
           }
           clusterData.shader = mshader;
           this.clusterData.push(clusterData);

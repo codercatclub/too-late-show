@@ -95,7 +95,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
       RenderSystem.configure({
         enableShadows: false,
         bloom: { enabled: true, intensity: 2 },
-        fog: { enabled: true, color: new Color("#0f1e33"), density: 0.01 },
+        fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
       })
     )
     .registerSystem(Object3DSystem)
