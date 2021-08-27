@@ -1,5 +1,6 @@
 uniform float timeMSec;
 uniform float cameraMove;
+uniform float playT;
 
 attribute vec3 color;
 
@@ -18,7 +19,6 @@ varying float decay;
 void main(){
   vNormal = normal;
   vec4 worldPos = modelMatrix * vec4(position, 1.0);
-
   worldPos.x += 2.0 * cameraMove * sin(0.01*cameraMove);
   worldPos.z += 3.0 * cameraMove * cos(0.1 + 0.02*cameraMove + worldPos.x);
 
@@ -34,6 +34,9 @@ void main(){
   //FRESNEL
   vec3 I = worldPos.xyz - cameraPosition;
   vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normalize(normal) );
+
+  float flash = sin(3.14 * min(playT/0.025, 1.0));
+  worldPos.xyz += 0.1*flash * (worldNormal + vec3(sin(timeMSec + 5.0 * worldPos.y), cos(timeMSec + 5.0 * worldPos.x), sin(timeMSec + 5.0 * worldPos.z)));
 
   float mFresnelBias = 0.3;
   float mFresnelScale = 2.1;

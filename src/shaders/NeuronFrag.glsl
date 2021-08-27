@@ -65,6 +65,7 @@ void main() {
   #endif
 
   float brightness = 1.0 - min(abs(vDist - playT)/0.02, 1.0);
+  float flash = sin(3.14 * min(playT/0.025, 1.0));
 	vec3 fractBy3 = vec3(
 		floor(fract(7. * timeMSec) + 0.5),
 		floor(fract(7. * timeMSec+0.3) + 0.5),
@@ -72,7 +73,7 @@ void main() {
 	);
   vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
   finalColor.rgb += glitchColor;
-  finalColor.rgb += 100.0 * brightness * fresnelColor;
+  finalColor.rgb += 10.0 * (brightness + flash) * vec3(1.0, 1.0, 1.0);
 
   float m = glitchFactor + 0.3 * sin(3.0*vWorldPos.x) + 0.2 * cos(4.0*vWorldPos.y);
 
