@@ -1,4 +1,4 @@
-import { System } from "../../ecs/index";
+import { System, World } from "../../ecs/index";
 import {
   TransformC,
   Object3DC,
@@ -8,6 +8,7 @@ import {
 import { applyQuery } from "../../ecs/index";
 import { getComponent } from "./utils";
 import { AnimationMixer } from "three";
+import { NeuronMatSystem } from "../NeuronMatSystem";
 
 export interface ScrollAnimationSystem extends System {
   mixers: Map<string, AnimationMixer>;
@@ -15,6 +16,7 @@ export interface ScrollAnimationSystem extends System {
   lastDelta: number;
   lastRealDelta: number;
   moving: boolean;
+  world: World | null,
 }
 
 export const ScrollAnimationSystem: ScrollAnimationSystem = {
@@ -25,8 +27,11 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
   lastDelta: 0,
   lastRealDelta: 0,
   moving: false,
+  world: null,
 
   init: function (world) {
+    this.world = world;
+
     this.entities = applyQuery(world.entities, this.queries);
 
     this.entities.forEach((ent) => {
@@ -58,7 +63,10 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
 
   tick: function (_time, deltaTime) {
     //if autoscroll
-    this.lastDelta = 0.2;
+    const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(NeuronMatSystem.type);
+    if(!neuronMatSystem?.isPlayingVideo) {
+      this.lastDelta = 0.2;
+    }
     let updateAmt = deltaTime * this.lastDelta;
     const newScrollTime = this.scrollTime + updateAmt;
     const maxScroll = 7.4;

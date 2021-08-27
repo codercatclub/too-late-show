@@ -48,7 +48,6 @@ export const MuscleMatSystem: MuscleMatSystem = {
 
   processEntity: function (ent) {
     if (!this.world) return;
-    const { shader } = getComponent(ent, MuscleMaterialC);
     const { object3d: parent } = getComponent(ent, Object3DC);
 
     const uniforms = {

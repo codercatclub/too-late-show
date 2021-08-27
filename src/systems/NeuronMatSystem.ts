@@ -24,6 +24,7 @@ interface ClusterData {
   playT: number;
   videoEl: HTMLVideoElement | null;
   index: number;
+  allowedToPlay: boolean;
 }
 
 interface NeuronMatSystem extends System {
@@ -33,6 +34,7 @@ interface NeuronMatSystem extends System {
   updateUniforms: (time: number, timeDelta: number) => void;
   lastCameraPosition: Vector3;
   lerpCameraMove: number,
+  isPlayingVideo: boolean,
   spark: Object3D;
 }
 
@@ -51,6 +53,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
   lastCameraPosition: new Vector3(),
   queries: [TransformC, Object3DC, NeuronMaterialC],
   lerpCameraMove: 0,
+  isPlayingVideo: false,
   spark: new Object3D(),
 
   init: function (world) {
@@ -88,7 +91,8 @@ export const NeuronMatSystem: NeuronMatSystem = {
             shader: null,
             playT: -1,
             videoEl: null,
-            index: 0
+            index: 0,
+            allowedToPlay: true
           }
 
           if(o.parent)
@@ -154,29 +158,37 @@ export const NeuronMatSystem: NeuronMatSystem = {
       }
       this.lastCameraPosition.copy(cameraPos);
     }
+
+    this.isPlayingVideo = false;
     this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
         if(clusterData.videoEl) { 
           clipDurations[clusterData.index] = clusterData.videoEl.duration;
         }
         let distFromCam = this.spark.position.distanceTo(clusterData.corePos);
-        if (distFromCam < 0.5 && clusterData.playT < 0) {
+        if(!clusterData.allowedToPlay && distFromCam > 1) {
+          clusterData.allowedToPlay = true;
+        }
+        if (distFromCam < 0.5 && clusterData.playT < 0 && clusterData.allowedToPlay) {
           //turn on
           clusterData.playT = 0;
           if(clusterData.videoEl) {
             clusterData.videoEl.pause();
             clusterData.videoEl.currentTime = 0;
             clusterData.videoEl.play();
+            this.isPlayingVideo = true;
           }
         }
         if (clusterData.playT >= 0) {
           clusterData.playT += timeDelta;
+          this.isPlayingVideo = true;
         }
 
         let playTMax = clipDurations[clusterData.index] ? clipDurations[clusterData.index] : 1;
         //final clamp and turn off
         if (clusterData.playT >= playTMax) {
           clusterData.playT = -1;
+          clusterData.allowedToPlay = false;
         }
 
         //shader activation is first 0.1
