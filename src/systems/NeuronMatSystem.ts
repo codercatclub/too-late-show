@@ -13,7 +13,7 @@ import {
   Color,
   VideoTexture,
   SpriteMaterial,
-  Object3D
+  Object3D,
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
@@ -33,8 +33,8 @@ interface NeuronMatSystem extends System {
   clusterData: ClusterData[];
   updateUniforms: (time: number, timeDelta: number) => void;
   lastCameraPosition: Vector3;
-  lerpCameraMove: number,
-  isPlayingVideo: boolean,
+  lerpCameraMove: number;
+  isPlayingVideo: boolean;
   spark: Object3D;
 }
 
@@ -42,9 +42,9 @@ const colorList = [
   new Color("#6e0b9c"),
   new Color("#5d00ff"),
   new Color("#0a4dab"),
-]
+];
 
-let clipDurations: number[] = []
+let clipDurations: number[] = [];
 
 export const NeuronMatSystem: NeuronMatSystem = {
   type: "NeuronMatSystem",
@@ -74,60 +74,67 @@ export const NeuronMatSystem: NeuronMatSystem = {
       fresnelColor: { type: "color", value: new Color("#56ff00") },
     };
     let materialOptions = {
-      transparent: true
+      transparent: true,
     };
 
-
     parent?.traverse((obj) => {
-      if(obj.name == "Spark") {
+      if (obj.name == "Spark") {
         this.spark = obj;
       }
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
 
+        let clusterData: ClusterData = {
+          corePos: new Vector3(),
+          shader: null,
+          playT: -1,
+          videoEl: null,
+          index: 0,
+          allowedToPlay: true,
+        };
 
-          let clusterData: ClusterData = {
-            corePos: new Vector3(),
-            shader: null,
-            playT: -1,
-            videoEl: null,
-            index: 0,
-            allowedToPlay: true
-          }
+        if (o.parent) {
+          clusterData.corePos = o.parent.position;
+        }
 
-          if(o.parent)
-          {
-            clusterData.corePos = o.parent.position;
-          }
+        const material = new MeshPhongMaterial(materialOptions);
 
-          const material = new MeshPhongMaterial(materialOptions);
+        let i = parseInt(o.name[o.name.length - 1]);
+        
+        if (!i) {
+          i = 0;
+        }
+        
+        clusterData.index = i;
 
-          let i = parseInt(o.name[o.name.length - 1]);
-          if(!i) {
-            i = 0;
-          }
-          clusterData.index = i;
-          if (o.name.includes("core")) {
-            var videoEl = document.createElement("video");
-            // videoEl.src = o.userData.videoSrc;
-            videoEl.src = "assets/videos/jasmin.mp4";
-            //videoEl.loop = true;
-    
-            const texture = new VideoTexture(videoEl);
-            material.map = texture;
-            clusterData.videoEl = videoEl;
-          }
-          material.onBeforeCompile = (mshader) => {
-            mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
-            mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
-            mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
-            let colorIdx = clusterData.index % colorList.length;
-            mshader.uniforms.fresnelColor.value = colorList[colorIdx];
-            clusterData.shader = mshader;
-            this.clusterData.push(clusterData);
-          };
+        if (o.name.includes("main_core")) {
+          var videoEl = document.createElement("video");
+          // videoEl.src = o.userData.videoSrc;
+          videoEl.src = `assets/videos/${o.userData.videoSrc}`;
+          //videoEl.loop = true;
 
-          o.material = material;
+          const texture = new VideoTexture(videoEl);
+          
+          texture.flipY = false;
+
+          material.map = texture;
+
+          console.log('[D] o', o)
+          
+          clusterData.videoEl = videoEl;
+        }
+
+        material.onBeforeCompile = (mshader) => {
+          mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
+          mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
+          mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
+          let colorIdx = clusterData.index % colorList.length;
+          mshader.uniforms.fresnelColor.value = colorList[colorIdx];
+          clusterData.shader = mshader;
+          this.clusterData.push(clusterData);
+        };
+
+        o.material = material;
       }
     });
 
@@ -148,12 +155,12 @@ export const NeuronMatSystem: NeuronMatSystem = {
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
     let cam = renderSystem?.camera?.parent;
     let cameraMove = 0;
-    if(cam) {
+    if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
       cameraMove = cameraMove < 3.0 ? 0.0 : cameraMove;
       this.lerpCameraMove = 0.5 * this.lerpCameraMove + 0.5 * cameraMove;
-      if(this.lerpCameraMove < 0.005) {
+      if (this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
       }
       this.lastCameraPosition.copy(cameraPos);
@@ -162,17 +169,21 @@ export const NeuronMatSystem: NeuronMatSystem = {
     this.isPlayingVideo = false;
     this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
-        if(clusterData.videoEl) { 
+        if (clusterData.videoEl) {
           clipDurations[clusterData.index] = clusterData.videoEl.duration;
         }
         let distFromCam = this.spark.position.distanceTo(clusterData.corePos);
-        if(!clusterData.allowedToPlay && distFromCam > 1) {
+        if (!clusterData.allowedToPlay && distFromCam > 1) {
           clusterData.allowedToPlay = true;
         }
-        if (distFromCam < 0.5 && clusterData.playT < 0 && clusterData.allowedToPlay) {
+        if (
+          distFromCam < 0.5 &&
+          clusterData.playT < 0 &&
+          clusterData.allowedToPlay
+        ) {
           //turn on
           clusterData.playT = 0;
-          if(clusterData.videoEl) {
+          if (clusterData.videoEl) {
             clusterData.videoEl.pause();
             clusterData.videoEl.currentTime = 0;
             clusterData.videoEl.play();
@@ -184,7 +195,9 @@ export const NeuronMatSystem: NeuronMatSystem = {
           this.isPlayingVideo = true;
         }
 
-        let playTMax = clipDurations[clusterData.index] ? clipDurations[clusterData.index] : 1;
+        let playTMax = clipDurations[clusterData.index]
+          ? clipDurations[clusterData.index]
+          : 1;
         //final clamp and turn off
         if (clusterData.playT >= playTMax) {
           clusterData.playT = -1;
@@ -192,7 +205,8 @@ export const NeuronMatSystem: NeuronMatSystem = {
         }
 
         //shader activation is first 0.1
-        let playT = clusterData.playT > 0 ? Math.min(0.2 * clusterData.playT, 1) : 1;
+        let playT =
+          clusterData.playT > 0 ? Math.min(0.2 * clusterData.playT, 1) : 1;
 
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;

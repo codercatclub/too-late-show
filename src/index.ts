@@ -2,12 +2,12 @@ import { extend, World, newComponent } from "./ecs/index";
 import { RenderSystem } from "./systems/core/RenderSystem";
 import { Object3DSystem } from "./systems/core/Object3DSystem";
 import { AssetManager } from "./ecs/assetManager";
-import { Asset, HemisphereLight, StandardPrimitive } from "./ecs/archetypes";
+import { Asset } from "./ecs/archetypes";
 import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
-import { Vector3, Color } from "three";
+import { Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { ScrollAnimationC, GLTFCameraC, NeuronCoreC, NeuronMaterialC, MuscleMaterialC, EnvSphereC, AnimationC } from "./ecs/components";
+import { ScrollAnimationC, GLTFCameraC, NeuronMaterialC, MuscleMaterialC, EnvSphereC } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -33,6 +33,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .addAsset("assets/models/env_neurons.glb", "env_neurons")
     .addAsset("assets/models/env.glb", "env")
     .addAsset("assets/models/track.glb", "track")
+    .addAsset("assets/models/sign.glb", "sign")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -52,6 +53,13 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
       src: "assets/models/track.glb",
     }),
     [newComponent(NeuronMaterialC), newComponent(MuscleMaterialC), newComponent(ScrollAnimationC)]
+  );
+
+  const sign = extend(
+    Asset({
+      src: "assets/models/sign.glb",
+    }),
+    []
   );
 
   const clusters = extend(
@@ -88,6 +96,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .addEntity(muscles)
     .addEntity(env)
     .addEntity(track)
+    .addEntity(sign)
     // .addEntity(env_neurons)
 
   world
