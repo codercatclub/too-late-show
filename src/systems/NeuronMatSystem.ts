@@ -64,7 +64,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
   processEntity: function (ent) {
     if (!this.world) return;
-    const { shader } = getComponent(ent, NeuronMaterialC);
+    const { shader, color } = getComponent(ent, NeuronMaterialC);
     const { object3d: parent } = getComponent(ent, Object3DC);
 
     const uniforms = {
@@ -119,8 +119,6 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
           material.map = texture;
 
-          console.log('[D] o', o)
-          
           clusterData.videoEl = videoEl;
         }
 
@@ -129,7 +127,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
           mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
           mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
           let colorIdx = clusterData.index % colorList.length;
-          mshader.uniforms.fresnelColor.value = colorList[colorIdx];
+          mshader.uniforms.fresnelColor.value = color ? color : colorList[colorIdx];
           clusterData.shader = mshader;
           this.clusterData.push(clusterData);
         };
@@ -196,7 +194,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
         }
 
         let playTMax = clipDurations[clusterData.index]
-          ? clipDurations[clusterData.index]
+          ? clipDurations[clusterData.index] - 1
           : 1;
         //final clamp and turn off
         if (clusterData.playT >= playTMax) {

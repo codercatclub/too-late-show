@@ -7,7 +7,13 @@ import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Color } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
-import { ScrollAnimationC, GLTFCameraC, NeuronMaterialC, MuscleMaterialC, EnvSphereC } from "./ecs/components";
+import {
+  ScrollAnimationC,
+  GLTFCameraC,
+  NeuronMaterialC,
+  MuscleMaterialC,
+  EnvSphereC,
+} from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
 import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
@@ -52,14 +58,50 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     Asset({
       src: "assets/models/track.glb",
     }),
-    [newComponent(NeuronMaterialC), newComponent(MuscleMaterialC), newComponent(ScrollAnimationC)]
+    [
+      newComponent(NeuronMaterialC),
+      newComponent(MuscleMaterialC),
+      newComponent(ScrollAnimationC),
+    ]
   );
 
-  const sign = extend(
+  // const sign = extend(
+  //   Asset({
+  //     src: "assets/models/sign.glb",
+  //   }),
+  //   []
+  // );
+
+  const sign_neurons = extend(
     Asset({
       src: "assets/models/sign.glb",
+      part: "Scene/neurons",
     }),
-    []
+    [newComponent(NeuronMaterialC, { color: new Color("#6e0b9c") })]
+  );
+
+  const sign_body = extend(
+    Asset({
+      src: "assets/models/sign.glb",
+      part: "Scene/sign_body",
+    }),
+    [newComponent(NeuronMaterialC, { color: new Color("#cf15b0") })]
+  );
+
+  const sign_bulbs = extend(
+    Asset({
+      src: "assets/models/sign.glb",
+      part: "Scene/bulbs",
+    }),
+    [newComponent(NeuronMaterialC, { color: new Color("#fcf4d4") })]
+  );
+
+  const sign_cells = extend(
+    Asset({
+      src: "assets/models/sign.glb",
+      part: "Scene/sign_cells",
+    }),
+    [newComponent(MuscleMaterialC)]
   );
 
   const clusters = extend(
@@ -96,8 +138,11 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .addEntity(muscles)
     .addEntity(env)
     .addEntity(track)
-    .addEntity(sign)
-    // .addEntity(env_neurons)
+    .addEntity(sign_neurons)
+    .addEntity(sign_body)
+    .addEntity(sign_bulbs)
+    .addEntity(sign_cells);
+  // .addEntity(env_neurons)
 
   world
     .registerSystem(
@@ -113,7 +158,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .registerSystem(StandardPrimitiveSystem)
     .registerSystem(AudioSystem)
     .registerSystem(OrbitControlsSystem)
-    .registerSystem(StatsSystem)
+    // .registerSystem(StatsSystem)
     .registerSystem(HemisphereLightSystem)
     .registerSystem(PointLightSystem)
     .registerSystem(MaterialSystem)
@@ -124,7 +169,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .registerSystem(GLTFCameraSystem)
     .registerSystem(AnimationSystem)
     .registerSystem(ScrollAnimationSystem)
-    .registerSystem(EnvSphereSystem)
+    .registerSystem(EnvSphereSystem);
 
   world.init();
 })();

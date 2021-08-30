@@ -114,8 +114,10 @@ export const RenderSystem: RenderSystem = {
     if (this.bloom.enabled && this.composer == null) {
       this.composer = new EffectComposer(this.renderer);
       var bloomPass = new BloomPass( this.bloom.intensity, 25, 5);
+      const saopass = new SSAARenderPass(this.scene, this.camera, 0 , 0);
       const renderScene = new RenderPass(this.scene, this.camera);
       this.composer.addPass(renderScene);
+      this.composer.addPass(saopass);
       this.composer.addPass(bloomPass);
       var effectCopy = new ShaderPass(CopyShader);
       this.composer.addPass(effectCopy);

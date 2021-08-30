@@ -90,10 +90,16 @@ export const MaterialC = {
   },
 };
 
-export const NeuronMaterialC = {
+interface NeuronMaterialCData {
+  shader: string;
+  color: Color | null;
+}
+
+export const NeuronMaterialC: Component<NeuronMaterialCData> = {
   type: "NeuronMaterialC",
   data: {
     shader: "Neuron",
+    color: null,
   },
 };
 

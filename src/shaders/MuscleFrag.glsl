@@ -16,5 +16,4 @@ void main() {
   gl_FragColor.rb += 0.5 * vReflectionFactor * vNormal.rb;
   gl_FragColor *= 0.3;
   #include <fog_fragment>
-
 }
