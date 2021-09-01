@@ -11,6 +11,7 @@ import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
 interface RenderSystemConfig {
   enableShadows: boolean;
+  captureMode: boolean;
   bloom: { enabled: boolean; intensity: number};
   fog: { enabled: boolean; color: Color; density: number };
 }
@@ -29,6 +30,7 @@ export interface RenderSystem extends System, RenderSystemConfig {
   configure(props: Partial<RenderSystemConfig>): RenderSystem;
   setCamera(cam: PerspectiveCamera): void;
   composer: EffectComposer | null;
+  timeSinceLastRender: number;
 }
 
 export const RenderSystem: RenderSystem = {
@@ -40,12 +42,15 @@ export const RenderSystem: RenderSystem = {
   clock: null,
   queries: [],
   enableShadows: false,
+  captureMode: false,
   bloom: { enabled: false, intensity: 2},
   composer: null,
+  timeSinceLastRender: 0,
   fog: { enabled: false, color: new Color(1, 1, 1), density: 0.1 },
 
-  configure: function ({ enableShadows, bloom, fog }) {
+  configure: function ({ enableShadows, captureMode, bloom, fog }) {
     if (enableShadows) this.enableShadows = enableShadows;
+    if (captureMode) this.captureMode = captureMode;
     if (bloom) this.bloom = bloom;
     if (fog) this.fog = fog;
 
@@ -110,26 +115,33 @@ export const RenderSystem: RenderSystem = {
   animation: function () {
     if (!this.clock || !this.scene || !this.camera || !this.renderer) return;
 
+    this.timeSinceLastRender += this.clock.getDelta();
+    const elapsedTime = this.clock.elapsedTime;
+
+    //frame cap at 30 FPS if we are in capture mode 
+    if(this.captureMode && this.timeSinceLastRender < 1/30) {
+      return;
+    }
+
     //set post processing after everything has been loaded
     if (this.bloom.enabled && this.composer == null) {
       this.composer = new EffectComposer(this.renderer);
       var bloomPass = new BloomPass( this.bloom.intensity, 25, 5);
-      const saopass = new SSAARenderPass(this.scene, this.camera, 0 , 0);
       const renderScene = new RenderPass(this.scene, this.camera);
       this.composer.addPass(renderScene);
-      this.composer.addPass(saopass);
+      if(this.captureMode) {
+        const saopass = new SSAARenderPass(this.scene, this.camera, 0 , 0);
+        this.composer.addPass(saopass);
+      }
       this.composer.addPass(bloomPass);
       var effectCopy = new ShaderPass(CopyShader);
       this.composer.addPass(effectCopy);
       effectCopy.renderToScreen = true;
     }
 
-    const delta = this.clock.getDelta();
-    const elapsedTime = this.clock.elapsedTime;
+    this.onFrameStart(elapsedTime, this.timeSinceLastRender);
 
-    this.onFrameStart(elapsedTime, delta);
-
-    this.tick(elapsedTime, delta);
+    this.tick(elapsedTime, this.timeSinceLastRender);
 
     if (this.bloom.enabled) {
       this.composer?.render();
@@ -137,7 +149,9 @@ export const RenderSystem: RenderSystem = {
       this.renderer.render(this.scene, this.camera);
     }
 
-    this.onFrameEnd(elapsedTime, delta);
+    this.onFrameEnd(elapsedTime, this.timeSinceLastRender);
+
+    this.timeSinceLastRender = 0;
   },
 
   onWindowResize: function () {

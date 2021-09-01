@@ -9,6 +9,7 @@ import { applyQuery } from "../../ecs/index";
 import { getComponent } from "./utils";
 import { AnimationMixer } from "three";
 import { NeuronMatSystem } from "../NeuronMatSystem";
+import { RenderSystem } from "./RenderSystem";
 
 export interface ScrollAnimationSystem extends System {
   mixers: Map<string, AnimationMixer>;
@@ -62,10 +63,15 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
   },
 
   tick: function (_time, deltaTime) {
-    //if autoscroll
-    const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(NeuronMatSystem.type);
-    if(!neuronMatSystem?.isPlayingVideo) {
-      this.lastDelta = 0.2;
+    //only hard set delta if autoscrolling in capture mode
+    const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
+    if(renderSystem?.captureMode) {
+      const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(NeuronMatSystem.type);
+      if(!neuronMatSystem?.isPlayingVideo) {
+        this.lastDelta = 0.2;
+      } else {
+        this.lastDelta = 0;
+      }
     }
     let updateAmt = deltaTime * this.lastDelta;
     const newScrollTime = this.scrollTime + updateAmt;

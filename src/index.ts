@@ -147,6 +147,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
   world
     .registerSystem(
       RenderSystem.configure({
+        captureMode: true,
         enableShadows: false,
         bloom: { enabled: true, intensity: 2 },
         fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
