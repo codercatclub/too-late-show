@@ -13,6 +13,7 @@ import {
   NeuronMaterialC,
   MuscleMaterialC,
   EnvSphereC,
+  SignMaterialC,
 } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
@@ -28,6 +29,7 @@ import { GLTFCameraSystem } from "./systems/core/GLTFCameraSystem";
 import { AnimationSystem } from "./systems/core/AnimationSystem";
 import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
 import { EnvSphereSystem } from "./systems/EnvSphereSystem";
+import { SignMatSystem } from "./systems/SignMatSystem";
 
 (async () => {
   const assetManager = new AssetManager();
@@ -85,7 +87,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
       src: "assets/models/sign.glb",
       part: "Scene/sign_body",
     }),
-    [newComponent(NeuronMaterialC, { color: new Color("#cf15b0") })]
+    [newComponent(SignMaterialC, { color: new Color("#cf15b0") })]
   );
 
   const sign_bulbs = extend(
@@ -93,7 +95,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
       src: "assets/models/sign.glb",
       part: "Scene/bulbs",
     }),
-    [newComponent(NeuronMaterialC, { color: new Color("#fcf4d4") })]
+    [newComponent(SignMaterialC, { color: new Color("#fcf4d4") })]
   );
 
   const sign_cells = extend(
@@ -147,7 +149,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
   world
     .registerSystem(
       RenderSystem.configure({
-        captureMode: true,
+        captureMode: false,
         enableShadows: false,
         bloom: { enabled: true, intensity: 2 },
         fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
@@ -167,6 +169,7 @@ import { EnvSphereSystem } from "./systems/EnvSphereSystem";
     .registerSystem(NeuronCoreSystem)
     .registerSystem(NeuronMatSystem)
     .registerSystem(MuscleMatSystem)
+    .registerSystem(SignMatSystem)
     .registerSystem(GLTFCameraSystem)
     .registerSystem(AnimationSystem)
     .registerSystem(ScrollAnimationSystem)

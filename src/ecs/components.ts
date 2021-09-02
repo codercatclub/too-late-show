@@ -110,6 +110,13 @@ export const MuscleMaterialC = {
   },
 };
 
+export const SignMaterialC = {
+  type: "SignMaterialC",
+  data: {
+    color: new Color(0xffffff),
+  },
+};
+
 export const CCMaterialC = {
   type: "CCMaterialC",
   data: {
