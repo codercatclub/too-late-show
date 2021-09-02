@@ -14,6 +14,7 @@ import {
   MuscleMaterialC,
   EnvSphereC,
   SignMaterialC,
+  AnimationC,
 } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
@@ -59,6 +60,8 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   const track = extend(
     Asset({
       src: "assets/models/track.glb",
+      debug: true
+      
     }),
     [
       newComponent(NeuronMaterialC),
@@ -77,15 +80,15 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   const sign_neurons = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "Scene/neurons",
+      part: "/Root/neurons",
     }),
-    [newComponent(NeuronMaterialC, { color: new Color("#6e0b9c") })]
+    [/* newComponent(NeuronMaterialC, { color: new Color("#6e0b9c") }) */]
   );
 
   const sign_body = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "Scene/sign_body",
+      part: "/Root/sign/sign_body",
     }),
     [newComponent(SignMaterialC, { color: new Color("#cf15b0") })]
   );
@@ -93,7 +96,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   const sign_bulbs = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "Scene/bulbs",
+      part: "/Root/sign/bulbs",
     }),
     [newComponent(SignMaterialC, { color: new Color("#fcf4d4") })]
   );
@@ -101,7 +104,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   const sign_cells = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "Scene/sign_cells",
+      part: "/Root/sign/cells",
     }),
     [newComponent(MuscleMaterialC)]
   );

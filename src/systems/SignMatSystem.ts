@@ -7,7 +7,7 @@ import {
   Color,
   MeshLambertMaterial,
   Vector3,
-  Shader
+  Shader,
 } from "three";
 import { getComponent } from "./core/utils";
 import { NeuronMatSystem } from "./NeuronMatSystem";
@@ -16,7 +16,7 @@ interface SignMatSystem extends System {
   world: World | null;
   processEntity: (ent: Entity) => void;
   updateUniforms: (time: number, timeDelta: number) => void;
-  materials: Shader[],
+  materials: Shader[];
   signPos: Vector3;
   turningOn: boolean;
 }
@@ -49,8 +49,7 @@ export const SignMatSystem: SignMatSystem = {
     parent?.traverse((obj) => {
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        let materialOptions = {
-        };
+        let materialOptions = {};
         const material = new MeshLambertMaterial(materialOptions);
         material.onBeforeCompile = (mshader) => {
           mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
@@ -70,17 +69,18 @@ export const SignMatSystem: SignMatSystem = {
   },
 
   updateUniforms: function (time, timeDelta) {
-    const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(NeuronMatSystem.type);
-    if(!neuronMatSystem) return;
+    const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(
+      NeuronMatSystem.type
+    );
+    if (!neuronMatSystem) return;
     let distFromSign = neuronMatSystem.spark.position.distanceTo(this.signPos);
-    console.log(distFromSign)
-    this.turningOn = (distFromSign < 12.5);
-    this.materials.forEach(shader => {
+
+    this.turningOn = distFromSign < 12.5;
+    this.materials.forEach((shader) => {
       let dir = this.turningOn ? 1 : -1;
       let nextVal = shader.uniforms["turnOnT"].value + 4.0 * dir * timeDelta;
-      shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0),1)
-    })
-
+      shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
+    });
   },
 
   tick: function (time, timeDelta) {

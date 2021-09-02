@@ -101,9 +101,9 @@ export const AssetSystem: AssetSystem = {
     if (part) {
       const obj = getObjectByPath(asset, part);
       if (obj) {
-        asset = obj;
+        asset = obj.clone();
       } else {
-        console.warn(`Can not fine part ${part} in object ${src}`);
+        console.warn(`Can not find part ${part} in object ${src}`);
       }
     }
 
