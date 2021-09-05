@@ -80,6 +80,7 @@ export const SignMatSystem: SignMatSystem = {
       let dir = this.turningOn ? 1 : -1;
       let nextVal = shader.uniforms["turnOnT"].value + 4.0 * dir * timeDelta;
       shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
+      shader.uniforms["timeMSec"].value = time;
     });
   },
 
