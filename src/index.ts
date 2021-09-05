@@ -60,8 +60,6 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   const track = extend(
     Asset({
       src: "assets/models/track.glb",
-      debug: true
-      
     }),
     [
       newComponent(NeuronMaterialC),
@@ -82,7 +80,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
       src: "assets/models/sign.glb",
       part: "/Root/neurons",
     }),
-    [/* newComponent(NeuronMaterialC, { color: new Color("#6e0b9c") }) */]
+    [newComponent(NeuronMaterialC, { color: new Color("#6e0b9c") })]
   );
 
   const sign_body = extend(
@@ -152,7 +150,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   world
     .registerSystem(
       RenderSystem.configure({
-        captureMode: false,
+        captureMode: true,
         enableShadows: false,
         bloom: { enabled: true, intensity: 2 },
         fog: { enabled: true, color: new Color("#060024"), density: 0.01 },

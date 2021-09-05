@@ -2,6 +2,7 @@ uniform float timeMSec;
 uniform float cameraMove;
 uniform float playT;
 
+attribute vec3 _color;
 attribute vec3 color;
 
 varying vec3 vNormal;
@@ -25,7 +26,7 @@ void main(){
 
   vWorldPos = worldPos.xyz;
 
-  vDist = color.r;
+  vDist = max(color.r, _color.r);
 
  #ifdef USE_MAP
 	vUv = uv;

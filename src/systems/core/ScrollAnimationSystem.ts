@@ -17,7 +17,7 @@ export interface ScrollAnimationSystem extends System {
   lastDelta: number;
   lastRealDelta: number;
   moving: boolean;
-  world: World | null,
+  world: World | null;
 }
 
 export const ScrollAnimationSystem: ScrollAnimationSystem = {
@@ -40,13 +40,16 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
       const { object3d } = getComponent(ent, Object3DC);
 
       const animClips = world.assets.animations.get(src);
-
       const mixer = new AnimationMixer(object3d);
 
       this.mixers.set(src, mixer);
+      
+      const startTime = 0;
+      this.scrollTime = startTime;
 
       animClips?.forEach((clip) => {
         mixer.clipAction(clip).play();
+        mixer.update(startTime)
       });
     });
 
@@ -65,17 +68,13 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
   tick: function (_time, deltaTime) {
     //only hard set delta if autoscrolling in capture mode
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
-    if(renderSystem?.captureMode) {
-      const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(NeuronMatSystem.type);
-      if(!neuronMatSystem?.isPlayingVideo) {
-        this.lastDelta = 0.2;
-      } else {
-        this.lastDelta = 0;
-      }
-    }
     let updateAmt = deltaTime * this.lastDelta;
+    if (renderSystem?.captureMode) {
+        this.lastDelta = deltaTime;
+      updateAmt = this.lastDelta;
+    }
     const newScrollTime = this.scrollTime + updateAmt;
-    const maxScroll = 11.45;
+    const maxScroll = 35;
 
     if (newScrollTime > maxScroll) {
       updateAmt = Math.max(0, maxScroll - this.scrollTime);

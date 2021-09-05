@@ -108,7 +108,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
         clusterData.index = i;
 
         if (o.name.includes("main_core")) {
-          var videoEl = document.createElement("video");
+          const videoEl = document.createElement("video");
           // videoEl.src = o.userData.videoSrc;
           videoEl.src = `assets/videos/${o.userData.videoSrc}`;
           //videoEl.loop = true;
@@ -156,14 +156,13 @@ export const NeuronMatSystem: NeuronMatSystem = {
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
-      cameraMove = cameraMove < 3.0 ? 0.0 : cameraMove;
+      cameraMove = cameraMove < 3.0 ? 0.0 : 0.5*cameraMove;
       this.lerpCameraMove = 0.5 * this.lerpCameraMove + 0.5 * cameraMove;
       if (this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
       }
       this.lastCameraPosition.copy(cameraPos);
     }
-
     this.isPlayingVideo = false;
     this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
@@ -195,7 +194,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
         let playTMax = clipDurations[clusterData.index]
           ? clipDurations[clusterData.index] - 1
-          : 1;
+          : 5;
         //final clamp and turn off
         if (clusterData.playT >= playTMax) {
           clusterData.playT = -1;
