@@ -1,5 +1,6 @@
 uniform float timeMSec;
 uniform float cameraMove;
+uniform float ignoreReflection; 
 
 attribute vec3 color;
 attribute float _id;
@@ -29,6 +30,7 @@ void main(){
   float mFresnelPower = 2.0;
   vReflectionFactor = mFresnelBias + mFresnelScale * abs(pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower ));
 
+  vReflectionFactor = mix(vReflectionFactor, 1.0, ignoreReflection);  
   vId = _id;
  #include <fog_vertex>
 }

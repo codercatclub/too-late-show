@@ -114,6 +114,7 @@ export const SignMaterialC = {
   type: "SignMaterialC",
   data: {
     color: new Color(0xffffff),
+    ignoreReflection: 0
   },
 };
 

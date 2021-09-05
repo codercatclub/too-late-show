@@ -38,12 +38,13 @@ export const SignMatSystem: SignMatSystem = {
   processEntity: function (ent) {
     if (!this.world) return;
     const { object3d: parent } = getComponent(ent, Object3DC);
-    const { color } = getComponent(ent, SignMaterialC);
+    const { color , ignoreReflection} = getComponent(ent, SignMaterialC);
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
       turnOnT: { type: "f", value: 0 },
       fresnelScale: { type: "f", value: 1 },
       fresnelColor: { type: "color", value: color },
+      ignoreReflection: { type: "f", value: ignoreReflection },
     };
 
     parent?.traverse((obj) => {

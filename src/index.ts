@@ -96,7 +96,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
       src: "assets/models/sign.glb",
       part: "/Root/sign/bulbs",
     }),
-    [newComponent(SignMaterialC, { color: new Color("#fcf4d4") })]
+    [newComponent(SignMaterialC, { color: new Color("#fcf4d4"), ignoreReflection: 1 })]
   );
 
   const sign_cells = extend(
