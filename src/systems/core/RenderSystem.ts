@@ -1,18 +1,19 @@
 import * as THREE from "three";
 import { Color, PerspectiveCamera } from "three";
 import { System } from "../../ecs/index";
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 // @ts-expect-error
-import {BloomPass}  from '../../shaders/BloomPass.js';
-import { SSAARenderPass } from 'three/examples/jsm/postprocessing/SSAARenderPass.js';
+import { BloomPass } from "../../shaders/BloomPass.js";
+import { SSAARenderPass } from "three/examples/jsm/postprocessing/SSAARenderPass.js";
+import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
 interface RenderSystemConfig {
   enableShadows: boolean;
   captureMode: boolean;
-  bloom: { enabled: boolean; intensity: number};
+  bloom: { enabled: boolean; intensity: number };
   fog: { enabled: boolean; color: Color; density: number };
 }
 
@@ -43,7 +44,7 @@ export const RenderSystem: RenderSystem = {
   queries: [],
   enableShadows: false,
   captureMode: false,
-  bloom: { enabled: false, intensity: 2},
+  bloom: { enabled: false, intensity: 2 },
   composer: null,
   timeSinceLastRender: 0,
   fog: { enabled: false, color: new Color(1, 1, 1), density: 0.1 },
@@ -118,25 +119,37 @@ export const RenderSystem: RenderSystem = {
     this.timeSinceLastRender += this.clock.getDelta();
     const elapsedTime = this.clock.elapsedTime;
 
-    //frame cap at 30 FPS if we are in capture mode 
-    if(this.captureMode && this.timeSinceLastRender < 1/30) {
+    //frame cap at 30 FPS if we are in capture mode
+    if (this.captureMode && this.timeSinceLastRender < 1 / 30) {
       return;
     }
 
     //set post processing after everything has been loaded
     if (this.bloom.enabled && this.composer == null) {
       this.composer = new EffectComposer(this.renderer);
-      var bloomPass = new BloomPass( this.bloom.intensity, 25, 5);
+      const bloomPass = new BloomPass(this.bloom.intensity, 25, 5);
       const renderScene = new RenderPass(this.scene, this.camera);
       this.composer.addPass(renderScene);
-      if(this.captureMode) {
-        const saopass = new SSAARenderPass(this.scene, this.camera, 0 , 0);
+
+      const bokehPass = new BokehPass(this.scene, this.camera, {
+        focus: 2.5,
+        aperture: 0.0001,
+        maxblur: 0.002,
+
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+
+      if (this.captureMode) {
+        const saopass = new SSAARenderPass(this.scene, this.camera, 0, 0);
         this.composer.addPass(saopass);
       }
+
       this.composer.addPass(bloomPass);
-      var effectCopy = new ShaderPass(CopyShader);
+      const effectCopy = new ShaderPass(CopyShader);
       this.composer.addPass(effectCopy);
-      effectCopy.renderToScreen = true;
+      this.composer.addPass(bokehPass);
+      // effectCopy.renderToScreen = true;
     }
 
     this.onFrameStart(elapsedTime, this.timeSinceLastRender);
