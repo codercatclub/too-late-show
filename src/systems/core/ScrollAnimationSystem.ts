@@ -74,7 +74,7 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
       updateAmt = this.lastDelta;
     }
     const newScrollTime = this.scrollTime + updateAmt;
-    const maxScroll = 35;
+    const maxScroll = 35.04;
 
     if (newScrollTime > maxScroll) {
       updateAmt = Math.max(0, maxScroll - this.scrollTime);

@@ -49,7 +49,7 @@ void main() {
 	
 
   #ifdef USE_MAP
-	vec4 texelColor = texture2D( map, vUv );
+	vec4 texelColor = texture2D( map, vUv ) * 0.7;
 	vec2 p = vUv - vec2(0.5,0.5);
 	float vignette = 2.0 * pow(length(p), 3.0);
 	texelColor.rgb = generic_desaturate(texelColor.rgb, 0.5);
@@ -64,7 +64,7 @@ void main() {
     vec4 finalColor = vec4(fresnelColor * vReflectionFactor, vReflectionFactor + 0.5);
   #endif
 
-  float brightness = 1.0 - min(abs(vDist - playT)/0.02, 1.0);
+  float brightness = 1.0 - min(abs(0.95 * vDist - playT)/0.02, 1.0);
   float flash = sin(3.14 * min(playT/0.025, 1.0));
 	vec3 fractBy3 = vec3(
 		floor(fract(7. * timeMSec) + 0.5),

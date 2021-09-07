@@ -9,7 +9,7 @@ import {
   Color,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
-  AdditiveBlending
+  AdditiveBlending,
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
@@ -28,9 +28,7 @@ interface MuscleMatSystem extends System {
   lerpCameraMove: number;
 }
 
-const colorList = [
-  new Color("#ff2009"),
-]
+const colorList = [new Color("#ff2009")];
 
 export const MuscleMatSystem: MuscleMatSystem = {
   type: "MuscleMatSystem",
@@ -55,14 +53,18 @@ export const MuscleMatSystem: MuscleMatSystem = {
       cameraMove: { type: "f", value: 0 },
       fresnelScale: { type: "f", value: 1 },
       fresnelColor: { type: "color", value: new Color("#3238a8") },
-      idleMove : {type: "f", value: 1}
+      idleMove: { type: "f", value: 1 },
     };
 
-
-
-
     parent?.traverse((obj) => {
-      if(!(obj.name == "Spark" || obj.name.includes("cell") || obj.name.includes("muscle") || obj.name.includes("lymps"))) {
+      if (
+        !(
+          obj.name == "Spark" ||
+          obj.name.includes("cell") ||
+          obj.name.includes("muscle") ||
+          obj.name.includes("lymps")
+        )
+      ) {
         return;
       }
       if (obj.type === "Mesh") {
@@ -70,30 +72,35 @@ export const MuscleMatSystem: MuscleMatSystem = {
         let clusterData: ClusterData = {
           corePos: new Vector3(),
           shader: null,
-        }
-
-        let isCell = o.name.includes("cell") || o.name.includes("lymps") || obj.name.includes("Spark")
-        let materialOptions = {
-          transparent: isCell
         };
-        
+
+        let isCell =
+          o.name.includes("cell") ||
+          o.name.includes("lymps") ||
+          obj.name.includes("Spark");
+        let materialOptions = {
+          transparent: isCell,
+        };
+
         obj.renderOrder = isCell ? 100 : 0;
-        const material = isCell ? new MeshPhysicalMaterial(materialOptions) : new MeshStandardMaterial(materialOptions);
+        const material = isCell
+          ? new MeshPhysicalMaterial(materialOptions)
+          : new MeshStandardMaterial(materialOptions);
         const shadername = isCell ? "Cell" : "Muscle";
 
         // if(isCell)
         // {
-          material.blending = AdditiveBlending;
+        material.blending = AdditiveBlending;
         // }
 
         material.onBeforeCompile = (mshader) => {
           mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
           mshader.vertexShader = require(`../shaders/${shadername}Vert.glsl`);
           mshader.fragmentShader = require(`../shaders/${shadername}Frag.glsl`);
-          if(o.name.includes("cell")) {
+          if (o.name.includes("cell")) {
             mshader.uniforms.fresnelScale.value = 0.5;
           }
-          if(o.name.includes("Spark")) {
+          if (o.name.includes("Spark")) {
             mshader.uniforms.idleMove.value = 0.2;
             mshader.uniforms.fresnelScale.value = 3;
           }
@@ -121,7 +128,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
       cameraMove = cameraMove < 2.0 ? 0.0 : cameraMove;
       this.lerpCameraMove = 0.7 * this.lerpCameraMove + 0.3 * cameraMove;
-      if(this.lerpCameraMove < 0.005) {
+      if (this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
       }
       this.lastCameraPosition.copy(cameraPos);

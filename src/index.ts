@@ -68,25 +68,10 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     ]
   );
 
-  // const sign = extend(
-  //   Asset({
-  //     src: "assets/models/sign.glb",
-  //   }),
-  //   []
-  // );
-
-  const sign_neurons = extend(
-    Asset({
-      src: "assets/models/sign.glb",
-      part: "/Root/neurons",
-    }),
-    [newComponent(NeuronMaterialC, { color: new Color("#6e0b9c") })]
-  );
-
   const sign_body = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "/Root/sign/sign_body",
+      part: "/Scene/sign_body",
     }),
     [newComponent(SignMaterialC, { color: new Color("#cf15b0") })]
   );
@@ -94,17 +79,9 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   const sign_bulbs = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "/Root/sign/bulbs",
+      part: "/Scene/bulbs",
     }),
     [newComponent(SignMaterialC, { color: new Color("#fcf4d4"), ignoreReflection: 1 })]
-  );
-
-  const sign_cells = extend(
-    Asset({
-      src: "assets/models/sign.glb",
-      part: "/Root/sign/cells",
-    }),
-    [newComponent(MuscleMaterialC)]
   );
 
   const clusters = extend(
@@ -141,10 +118,8 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .addEntity(muscles)
     .addEntity(env)
     .addEntity(track)
-    .addEntity(sign_neurons)
     .addEntity(sign_body)
     .addEntity(sign_bulbs)
-    .addEntity(sign_cells);
   // .addEntity(env_neurons)
 
   world

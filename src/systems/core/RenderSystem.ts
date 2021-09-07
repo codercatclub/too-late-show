@@ -148,7 +148,7 @@ export const RenderSystem: RenderSystem = {
       this.composer.addPass(bloomPass);
       const effectCopy = new ShaderPass(CopyShader);
       this.composer.addPass(effectCopy);
-      this.composer.addPass(bokehPass);
+      // this.composer.addPass(bokehPass);
       // effectCopy.renderToScreen = true;
     }
 

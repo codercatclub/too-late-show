@@ -38,7 +38,7 @@ export const SignMatSystem: SignMatSystem = {
   processEntity: function (ent) {
     if (!this.world) return;
     const { object3d: parent } = getComponent(ent, Object3DC);
-    const { color , ignoreReflection} = getComponent(ent, SignMaterialC);
+    const { color, ignoreReflection } = getComponent(ent, SignMaterialC);
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
       turnOnT: { type: "f", value: 0 },
@@ -79,7 +79,7 @@ export const SignMatSystem: SignMatSystem = {
     this.turningOn = distFromSign < 12.5;
     this.materials.forEach((shader) => {
       let dir = this.turningOn ? 1 : -1;
-      let nextVal = shader.uniforms["turnOnT"].value + 4.0 * dir * timeDelta;
+      let nextVal = shader.uniforms["turnOnT"].value + 16.0 * dir * timeDelta;
       shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
       shader.uniforms["timeMSec"].value = time;
     });
