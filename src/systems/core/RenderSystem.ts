@@ -77,6 +77,8 @@ export const RenderSystem: RenderSystem = {
         this.fog.color.getHex(),
         this.fog.density
       );
+      this.scene.background = this.fog.color;
+
     }
 
     // TODO

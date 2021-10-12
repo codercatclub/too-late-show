@@ -46,7 +46,7 @@ vec3 spectral_jet(float w)
 
 void main() {
 
-	
+  vec3 white = vec3(1.0, 1.0, 1.0);
 
   #ifdef USE_MAP
 	vec4 texelColor = texture2D( map, vUv ) * 0.7;
@@ -55,13 +55,14 @@ void main() {
 	texelColor.rgb = generic_desaturate(texelColor.rgb, 0.5);
 
 	float scan = 0.5 + 0.5 * sin(250.0*vUv.y + 30.0*timeMSec);
-	texelColor.rgb += 0.1*max(scan, vignette) * fresnelColor;
+	texelColor.rgb += 0.1*max(scan, vignette) * white;
 
-	texelColor.rgb = mix(texelColor.rgb, fresnelColor, vignette);
+	texelColor.rgb = mix(texelColor.rgb, white, vignette);
 	//texelColor = mapTexelToLinear( texelColor );
 	vec4 finalColor = vec4(texelColor.rgb, 1.0);
   #else
-    vec4 finalColor = vec4(fresnelColor * vReflectionFactor, vReflectionFactor + 0.5);
+    // vec4 finalColor = vec4(white * vReflectionFactor, vReflectionFactor + 0.5);
+    vec4 finalColor = vec4(white, vReflectionFactor + 1.5);
   #endif
 
   float brightness = 1.0 - min(abs(0.95 * vDist - playT)/0.02, 1.0);
@@ -71,14 +72,15 @@ void main() {
 		floor(fract(7. * timeMSec+0.3) + 0.5),
 		floor(fract(7. * timeMSec+0.6) + 0.5)
 	);
-  vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
-  finalColor.rgb += glitchColor;
-  finalColor.rgb += 10.0 * (brightness + flash) * vec3(1.0, 1.0, 1.0);
+  float glitchAmt = 5.0 * cameraMove * pow(vReflectionFactor, 12.0);
+  finalColor.rgb = mix(finalColor.rgb, fractBy3, glitchAmt);
+  finalColor.rgb = mix(finalColor.rgb, fresnelColor, 3.0*(brightness + flash));
 
   float m = glitchFactor + 0.3 * sin(3.0*vWorldPos.x) + 0.2 * cos(4.0*vWorldPos.y);
 
-  float r = smoothstep (0.5, 1.0, floor(7.0 * m - 2.0)/7.0 );
-  finalColor.rgb += decay * step(0.001,r) * spectral_jet(r);
+  float r = smoothstep (0.7, 0.8, floor(7.0 * m - 2.0)/7.0 );
+  //finalColor.rgb = mix(finalColor.rgb, spectral_jet(r), 0.8*decay * step(0.001,r));
+  finalColor.rgb = mix(finalColor.rgb, vec3(0.1,0.1,0.1), 0.8*decay * step(0.001,r));
   
   gl_FragColor = finalColor;
 

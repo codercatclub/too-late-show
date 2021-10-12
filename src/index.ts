@@ -116,7 +116,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .addEntity(cameras)
     .addEntity(clusters)
     .addEntity(muscles)
-    .addEntity(env)
+    // .addEntity(env)
     .addEntity(track)
     .addEntity(sign_body)
     .addEntity(sign_bulbs)
@@ -125,10 +125,10 @@ import { SignMatSystem } from "./systems/SignMatSystem";
   world
     .registerSystem(
       RenderSystem.configure({
-        captureMode: true,
+        captureMode: false,
         enableShadows: false,
-        bloom: { enabled: true, intensity: 2 },
-        fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
+        bloom: { enabled: false, intensity: 2 },
+        fog: { enabled: true, color: new Color("#000000"), density: 0.01 },
       })
     )
     .registerSystem(Object3DSystem)

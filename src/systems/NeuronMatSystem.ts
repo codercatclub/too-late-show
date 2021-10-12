@@ -39,9 +39,9 @@ interface NeuronMatSystem extends System {
 }
 
 const colorList = [
-  new Color("#6e0b9c"),
-  new Color("#5d00ff"),
-  new Color("#0a4dab"),
+  new Color("#ff00ff"),
+  new Color("#00ff00"),
+  new Color("#0000ff"),
 ];
 
 let clipDurations: number[] = [];

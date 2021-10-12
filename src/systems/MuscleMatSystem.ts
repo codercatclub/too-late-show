@@ -88,10 +88,10 @@ export const MuscleMatSystem: MuscleMatSystem = {
           : new MeshStandardMaterial(materialOptions);
         const shadername = isCell ? "Cell" : "Muscle";
 
-        // if(isCell)
-        // {
+        if(isCell)
+        {
         material.blending = AdditiveBlending;
-        // }
+        }
 
         material.onBeforeCompile = (mshader) => {
           mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
