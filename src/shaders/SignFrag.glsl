@@ -13,7 +13,7 @@ varying float vId;
 @import ./NoiseFx; 
 
 void main() {
-  vec3 finalColor = mix(vec3(0.0, 0.0, 0.0), vec3(pow(turnOnT,10.0), 0.0, 0.0), smoothstep(0.2,0.5,vReflectionFactor));
+  vec3 finalColor = mix(vec3(0.0, 0.0, 0.0), vec3(pow(1.0,10.0), 1.0, 1.0), smoothstep(0.2,0.5,vReflectionFactor));
   gl_FragColor = vec4(finalColor, 1.0);
   #include <fog_fragment>
 }
