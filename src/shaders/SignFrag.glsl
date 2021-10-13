@@ -13,9 +13,7 @@ varying float vId;
 @import ./NoiseFx; 
 
 void main() {
-  float flicker = sin(3.14 * smoothstep(0.85, 0.99, 0.5 + 0.5 * jagged(100.0 * vId + 1.0 * timeMSec)));
-  flicker *= step(0.8, vId) * turnOnT;
-  vec3 finalColor = (turnOnT * vReflectionFactor + 0.2 - 0.8 * flicker) * fresnelColor;
+  vec3 finalColor = mix(vec3(0.0, 0.0, 0.0), vec3(pow(turnOnT,10.0), 0.0, 0.0), smoothstep(0.2,0.5,vReflectionFactor));
   gl_FragColor = vec4(finalColor, 1.0);
   #include <fog_fragment>
 }

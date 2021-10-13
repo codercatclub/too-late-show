@@ -5,7 +5,7 @@ import { AssetManager } from "./ecs/assetManager";
 import { Asset } from "./ecs/archetypes";
 import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
-import { Color } from "three";
+import { Color, Vector3 } from "three";
 import { CameraSystem } from "./systems/core/CameraSystem";
 import {
   ScrollAnimationC,
@@ -42,7 +42,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .addAsset("assets/models/env_neurons.glb", "env_neurons")
     .addAsset("assets/models/env.glb", "env")
     .addAsset("assets/models/track.glb", "track")
-    .addAsset("assets/models/sign.glb", "sign")
+    .addAsset("assets/models/girl.glb", "girl")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -68,20 +68,14 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     ]
   );
 
-  const sign_body = extend(
+  const girl = extend(
     Asset({
-      src: "assets/models/sign.glb",
-      part: "/Scene/sign_body",
+      src: "assets/models/girl.glb",
+      position: new Vector3(-93.25, -48.2, -187.93),
+      scale: new Vector3(5.7, 5.7, 5.7),
+      rotation: new Vector3(Math.PI, -2.4, 0.2)
     }),
-    [newComponent(SignMaterialC, { color: new Color("#cf15b0") })]
-  );
-
-  const sign_bulbs = extend(
-    Asset({
-      src: "assets/models/sign.glb",
-      part: "/Scene/bulbs",
-    }),
-    [newComponent(SignMaterialC, { color: new Color("#fcf4d4"), ignoreReflection: 1 })]
+    [newComponent(SignMaterialC, { color: new Color("#ffffff") })]
   );
 
   const clusters = extend(
@@ -118,8 +112,8 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .addEntity(muscles)
     // .addEntity(env)
     .addEntity(track)
-    .addEntity(sign_body)
-    .addEntity(sign_bulbs)
+    .addEntity(girl)
+    // .addEntity(sign_bulbs)
   // .addEntity(env_neurons)
 
   world

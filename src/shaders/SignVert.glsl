@@ -17,17 +17,17 @@ void main(){
   vec4 mvPosition = viewMatrix * worldPos;
   gl_Position = projectionMatrix * mvPosition;
 
-  //FRESNEL
+  // //FRESNEL
   vec3 I = worldPos.xyz - cameraPosition;
+  I.z += 100.0;
   vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normalize(normal) );
   vNormal = worldNormal;
 
-  float mFresnelBias = 0.5;
+  float mFresnelBias = 0.05;
   float mFresnelScale = 2.1;
-  float mFresnelPower = 2.0;
+  float mFresnelPower = 2.3;
   vReflectionFactor = mFresnelBias + mFresnelScale * abs(pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower ));
 
-  vReflectionFactor = mix(vReflectionFactor, 1.0, ignoreReflection);  
   vId = color.r;
   #include <fog_vertex>
 }
