@@ -28,8 +28,8 @@ void main(){
   vec3 I = worldPos.xyz - cameraPosition;
   vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normalize(normal) );
 
-  worldNormal.x += 0.5 + 0.5  * sin(0.2*worldPos.x);
-  worldNormal.z +=  0.5 + 0.5  * sin(0.2*worldPos.z);
+  //worldNormal.x += 0.5 + 0.5  * sin(0.2*worldPos.x);
+  //worldNormal.z +=  0.5 + 0.5  * sin(0.2*worldPos.z);
   vNormal = worldNormal;
 
   float mFresnelBias = 0.5;
