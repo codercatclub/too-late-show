@@ -68,18 +68,18 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     ]
   );
 
-  const sign_body = extend(
+  const lora = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "/Scene/sign_body",
+      part: "/Scene/lora",
     }),
-    [newComponent(SignMaterialC, { color: new Color("#cf15b0") })]
+    [newComponent(SignMaterialC, { color: new Color("#121214") })]
   );
 
-  const sign_bulbs = extend(
+  const eyes = extend(
     Asset({
       src: "assets/models/sign.glb",
-      part: "/Scene/bulbs",
+      part: "/Scene/eyes",
     }),
     [newComponent(SignMaterialC, { color: new Color("#fcf4d4"), ignoreReflection: 1 })]
   );
@@ -95,7 +95,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     Asset({
       src: "assets/models/muscles.glb",
     }),
-    [newComponent(MuscleMaterialC)]
+    []
   );
 
   const env = extend(
@@ -118,16 +118,16 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .addEntity(muscles)
     .addEntity(env)
     .addEntity(track)
-    .addEntity(sign_body)
-    .addEntity(sign_bulbs)
+    .addEntity(lora)
+    .addEntity(eyes)
   // .addEntity(env_neurons)
 
   world
     .registerSystem(
       RenderSystem.configure({
-        captureMode: true,
+        captureMode: false,
         enableShadows: false,
-        bloom: { enabled: true, intensity: 2 },
+        bloom: { enabled: true, intensity: 0.5 },
         fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
       })
     )

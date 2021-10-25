@@ -5,7 +5,6 @@ import { getComponent } from "./core/utils";
 import {
   Color,
   Mesh,
-  MeshPhongMaterial,
   MeshPhysicalMaterial,
   Shader,
   UniformsUtils,
@@ -32,10 +31,10 @@ export const EnvSphereSystem: EnvSphereSystem = {
           value: 0,
         },
         env_c1: {
-          value: new Color(0x17285c),
+          value: new Color(0xC30909),
         },
         env_c2: {
-          value: new Color(0x060024),
+          value: new Color(0x000000),
         },
       };
 

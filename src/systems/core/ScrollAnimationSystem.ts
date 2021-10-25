@@ -43,20 +43,21 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
       const mixer = new AnimationMixer(object3d);
 
       this.mixers.set(src, mixer);
-      
+
       const startTime = 0;
       this.scrollTime = startTime;
 
       animClips?.forEach((clip) => {
         mixer.clipAction(clip).play();
-        mixer.update(startTime)
+        mixer.update(startTime);
       });
     });
 
     let removedTutorial = false;
     //get current time by scroll amount
     document.addEventListener("wheel", (event) => {
-      this.lastDelta = 0.5 * Math.min(Math.max(event.deltaY, -5), 5);
+      this.lastDelta = 0.5 * event.deltaY;
+
       if (!removedTutorial) {
         let tutorialEl = document.querySelector("cc-tutorial");
         tutorialEl?.remove();
@@ -70,7 +71,7 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
     let updateAmt = deltaTime * this.lastDelta;
     if (renderSystem?.captureMode) {
-        this.lastDelta = deltaTime;
+      this.lastDelta = deltaTime;
       updateAmt = this.lastDelta;
     }
     const newScrollTime = this.scrollTime + updateAmt;
