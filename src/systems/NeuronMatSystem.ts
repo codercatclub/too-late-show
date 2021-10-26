@@ -136,12 +136,6 @@ export const NeuronMatSystem: NeuronMatSystem = {
         o.material = material;
       }
     });
-
-    //onkeypress, fade in
-    window.addEventListener("keydown", (event) => {
-      if (event.key == "p") {
-      }
-    });
   },
 
   onEntityAdd: function (ent) {
@@ -170,16 +164,19 @@ export const NeuronMatSystem: NeuronMatSystem = {
         if (clusterData.videoEl) {
           clipDurations[clusterData.index] = clusterData.videoEl.duration;
         }
+
         let distFromCam = this.spark.position.distanceTo(clusterData.corePos);
+        
         if (!clusterData.allowedToPlay && distFromCam > 1) {
           clusterData.allowedToPlay = true;
         }
+
         if (
           distFromCam < 0.5 &&
           clusterData.playT < 0 &&
           clusterData.allowedToPlay
         ) {
-          //turn on
+          // turn on
           clusterData.playT = 0;
           if (clusterData.videoEl) {
             clusterData.videoEl.pause();
@@ -187,23 +184,28 @@ export const NeuronMatSystem: NeuronMatSystem = {
             clusterData.videoEl.play();
             this.isPlayingVideo = true;
           }
+
+          const event = new CustomEvent("play-activation-sound");
+          window.dispatchEvent(event);
         }
+
         if (clusterData.playT >= 0) {
           clusterData.playT += timeDelta;
           this.isPlayingVideo = true;
         }
 
-        let playTMax = clipDurations[clusterData.index]
+        const playTMax = clipDurations[clusterData.index]
           ? clipDurations[clusterData.index] - 1
           : 5;
-        //final clamp and turn off
+  
+        // final clamp and turn off
         if (clusterData.playT >= playTMax) {
           clusterData.playT = -1;
           clusterData.allowedToPlay = false;
         }
 
-        //shader activation is first 0.1
-        let playT =
+        // shader activation is first 0.1
+        const playT =
           clusterData.playT > 0 ? Math.min(0.2 * clusterData.playT, 1) : 1;
 
         clusterData.shader.uniforms["playT"].value = playT;

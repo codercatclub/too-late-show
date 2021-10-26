@@ -9,6 +9,7 @@ import {
 } from "./components";
 import { newEntity, Entity, newComponent } from "./index";
 import { Vector3, Color } from "three";
+import { AudioC } from "../systems/core/AudioSystem";
 
 /** Helper functions to construct commonly used Entities */
 
@@ -58,9 +59,9 @@ export type GeometryType = "Box" | "Sphere";
 
 interface StandardPrimitiveArchetype {
   type?: GeometryType;
-  position?: Vector3,
-  rotation?: Vector3,
-  scale?: Vector3,
+  position?: Vector3;
+  rotation?: Vector3;
+  scale?: Vector3;
 }
 
 export const StandardPrimitive = ({
@@ -98,4 +99,24 @@ export const HemisphereLight = ({
     newComponent(HemisphereLightC, { skyColor, groundColor, intensity }),
     newComponent(Object3DC),
     newComponent(TransformC, { position }),
+  ]);
+
+export const Audio = ({
+  position = new Vector3(0, 0, 0),
+  src = "",
+  autoplay = false,
+  loop = false,
+  volume = 1,
+  triggerEvent = "",
+}) =>
+  newEntity([
+    newComponent(Object3DC),
+    newComponent(TransformC, { position }),
+    newComponent(AudioC, {
+      src,
+      autoplay,
+      loop,
+      volume,
+      triggerEvent
+    }),
   ]);

@@ -1,8 +1,8 @@
-import { extend, World, newComponent } from "./ecs/index";
+import { extend, World, newComponent, newEntity } from "./ecs/index";
 import { RenderSystem } from "./systems/core/RenderSystem";
 import { Object3DSystem } from "./systems/core/Object3DSystem";
 import { AssetManager } from "./ecs/assetManager";
-import { Asset } from "./ecs/archetypes";
+import { Asset, Audio } from "./ecs/archetypes";
 import { AssetSystem } from "./systems/core/AssetSystem";
 import { PointLightSystem } from "./systems/core/PointLightSystem";
 import { Color } from "three";
@@ -14,7 +14,8 @@ import {
   MuscleMaterialC,
   EnvSphereC,
   SignMaterialC,
-  AnimationC,
+  Object3DC,
+  TransformC,
 } from "./ecs/components";
 import { MaterialSystem } from "./systems/MaterialSystem";
 import { HemisphereLightSystem } from "./systems/core/HemisphereLightSystem";
@@ -22,7 +23,7 @@ import { OrbitControlsSystem } from "./systems/core/OrbitControlsSystem";
 import { CCMaterialSystem } from "./systems/CCMaterialSystem";
 import { NeuronMatSystem } from "./systems/NeuronMatSystem";
 import { MuscleMatSystem } from "./systems/MuscleMatSystem";
-import { AudioSystem } from "./systems/core/AudioSystem";
+import { AudioC, AudioSystem } from "./systems/core/AudioSystem";
 import { StandardPrimitiveSystem } from "./systems/core/StandardPrimitiveSystem";
 import { StatsSystem } from "./systems/core/StatsSystem";
 import { GLTFCameraSystem } from "./systems/core/GLTFCameraSystem";
@@ -42,6 +43,8 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .addAsset("assets/models/env.glb", "env")
     .addAsset("assets/models/track.glb", "track")
     .addAsset("assets/models/sign.glb", "sign")
+    .addAsset("assets/sounds/Relaxing_Wires_04.mp3", "ambient_sound")
+    .addAsset("assets/sounds/Utilities-Flares-03.mp3", "activation_sound")
     .addAsset("assets/textures/env.jpg", "env_tex"); // Environmental texture for PBR material.
 
   // Wait until all assets are loaded
@@ -67,6 +70,19 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     ]
   );
 
+  const ambientSound = Audio({
+    src: "assets/sounds/Relaxing_Wires_04.mp3",
+    autoplay: true,
+    volume: 0.5,
+    loop: true,
+  });
+
+  const activationSound = Audio({
+    src: "assets/sounds/Utilities-Flares-03.mp3",
+    triggerEvent: "play-activation-sound",
+    volume: 0.05,
+  });
+
   const lora = extend(
     Asset({
       src: "assets/models/sign.glb",
@@ -80,7 +96,12 @@ import { SignMatSystem } from "./systems/SignMatSystem";
       src: "assets/models/sign.glb",
       part: "/Scene/eyes",
     }),
-    [newComponent(SignMaterialC, { color: new Color("#fcf4d4"), ignoreReflection: 1 })]
+    [
+      newComponent(SignMaterialC, {
+        color: new Color("#fcf4d4"),
+        ignoreReflection: 1,
+      }),
+    ]
   );
 
   const clusters = extend(
@@ -113,12 +134,14 @@ import { SignMatSystem } from "./systems/SignMatSystem";
 
   world
     .addEntity(cameras)
+    .addEntity(ambientSound)
+    .addEntity(activationSound)
     .addEntity(clusters)
     .addEntity(muscles)
     .addEntity(env)
     .addEntity(track)
     .addEntity(lora)
-    .addEntity(eyes)
+    .addEntity(eyes);
   // .addEntity(env_neurons)
 
   world

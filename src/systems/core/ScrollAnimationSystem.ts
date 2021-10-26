@@ -8,7 +8,6 @@ import {
 import { applyQuery } from "../../ecs/index";
 import { getComponent } from "./utils";
 import { AnimationMixer } from "three";
-import { NeuronMatSystem } from "../NeuronMatSystem";
 import { RenderSystem } from "./RenderSystem";
 
 export interface ScrollAnimationSystem extends System {

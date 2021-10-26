@@ -1,9 +1,46 @@
-import { System, World } from "../../ecs/index";
-import { TransformC, Object3DC, AudioC } from "../../ecs/components";
+import { Component, System, World } from "../../ecs/index";
+import { TransformC, Object3DC } from "../../ecs/components";
 import { applyQuery } from "../../ecs/index";
 import { getComponent } from "./utils";
-import { Audio } from "three";
+import { Audio, AudioListener } from "three";
 import { RenderSystem } from "./RenderSystem";
+
+interface AudioCData {
+  src: string;
+  audio: Audio | null;
+  volume: number;
+  autoplay: boolean;
+  loop: boolean;
+  triggerEvent: string | null;
+}
+
+export const AudioC: Component<AudioCData> = {
+  type: "AudioC",
+  data: {
+    src: "",
+    volume: 0.5,
+    audio: null,
+    autoplay: false,
+    loop: false,
+    triggerEvent: null,
+  },
+};
+
+const newAudio = (
+  listener: AudioListener,
+  buffer: AudioBuffer,
+  volume: number,
+  loop: boolean = false
+): Audio<GainNode> => {
+  const audio = new Audio(listener);
+
+  audio.setBuffer(buffer);
+  audio.setVolume(volume);
+
+  audio.loop = loop;
+
+  return audio;
+};
 
 export interface AudioSystem extends System {
   world: World | null;
@@ -28,9 +65,9 @@ export const AudioSystem: AudioSystem = {
 
     // TODO (Kirill): Looks like this fails in some cases causing app to hand for a few second on load
     // It logs: "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu"
-    // const audioListener = new AudioListener();
+    const audioListener = new AudioListener();
 
-    // renderSystem?.camera?.add(audioListener);
+    renderSystem?.camera?.add(audioListener);
 
     this.entities.forEach((ent) => {
       const cmp = getComponent(ent, AudioC);
@@ -39,13 +76,21 @@ export const AudioSystem: AudioSystem = {
       const audioBuffer = world.assets.audio.get(src);
 
       if (audioBuffer) {
-        const audio = new Audio(audioListener);
+        cmp.audio = newAudio(audioListener, audioBuffer, volume, loop);
 
-        audio.setBuffer(audioBuffer);
-        audio.setVolume(volume);
-        audio.loop = loop;
-
-        cmp.audio = audio;
+        // Play sound triggered by custom event
+        // Useful for triggering sound from another system
+        if (cmp.triggerEvent) {
+          window.addEventListener(cmp.triggerEvent, () => {
+            const tempAudio = newAudio(
+              audioListener,
+              audioBuffer,
+              volume,
+              loop
+            );
+            !this.muted ? tempAudio.play() : null;
+          });
+        }
       } else {
         console.warn(
           `No sound data found for a given source ${src}`,
