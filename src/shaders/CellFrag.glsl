@@ -14,7 +14,7 @@ void main() {
   vec3 finalColor = fresnelColor;
   finalColor.r += 0.3*sin(vWorldPos.x);
   finalColor.g += 0.3*sin(vWorldPos.z);
-  gl_FragColor = vec4(vReflectionFactor*finalColor, vReflectionFactor);
+  gl_FragColor = vec4(vReflectionFactor * finalColor, 1.0);
   #include <fog_fragment>
 
 }
