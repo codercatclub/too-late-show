@@ -172,17 +172,6 @@ export const AudioC: Component<AudioCData> = {
   },
 };
 
-interface NeuronCoreCData {
-  video: string;
-}
-
-export const NeuronCoreC: Component<NeuronCoreCData> = {
-  type: "NeuronCore",
-  data: {
-    video: ""
-  }
-};
-
 export const EnvSphereC: Component<null> = {
   type: "NeuronCore",
   data: null,

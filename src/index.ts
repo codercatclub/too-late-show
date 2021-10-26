@@ -25,7 +25,6 @@ import { MuscleMatSystem } from "./systems/MuscleMatSystem";
 import { AudioSystem } from "./systems/core/AudioSystem";
 import { StandardPrimitiveSystem } from "./systems/core/StandardPrimitiveSystem";
 import { StatsSystem } from "./systems/core/StatsSystem";
-import { NeuronCoreSystem } from "./systems/NeuronCoreSystem";
 import { GLTFCameraSystem } from "./systems/core/GLTFCameraSystem";
 import { AnimationSystem } from "./systems/core/AnimationSystem";
 import { ScrollAnimationSystem } from "./systems/core/ScrollAnimationSystem";
@@ -142,7 +141,6 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     .registerSystem(PointLightSystem)
     .registerSystem(MaterialSystem)
     .registerSystem(CCMaterialSystem)
-    .registerSystem(NeuronCoreSystem)
     .registerSystem(NeuronMatSystem)
     .registerSystem(MuscleMatSystem)
     .registerSystem(SignMatSystem)

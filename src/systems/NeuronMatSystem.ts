@@ -2,17 +2,13 @@ import { System } from "../ecs/index";
 import { TransformC, Object3DC, NeuronMaterialC } from "../ecs/components";
 import { applyQuery, Entity, World } from "../ecs/index";
 import {
-  SkinnedMesh,
   Mesh,
   UniformsUtils,
   MeshPhongMaterial,
   Vector3,
   Shader,
-  Camera,
-  PerspectiveCamera,
   Color,
   VideoTexture,
-  SpriteMaterial,
   Object3D,
 } from "three";
 import { getComponent } from "./core/utils";
@@ -100,21 +96,24 @@ export const NeuronMatSystem: NeuronMatSystem = {
         const material = new MeshPhongMaterial(materialOptions);
 
         let i = parseInt(o.name[o.name.length - 1]);
-        
+
         if (!i) {
           i = 0;
         }
-        
+
         clusterData.index = i;
 
         if (o.name.includes("main_core")) {
           const videoEl = document.createElement("video");
-          // videoEl.src = o.userData.videoSrc;
+
           videoEl.src = `assets/videos/${o.userData.videoSrc}`;
-          //videoEl.loop = true;
+
+          videoEl.muted = true;
+          videoEl.autoplay = true;
+          videoEl.loop = true;
 
           const texture = new VideoTexture(videoEl);
-          
+
           texture.flipY = false;
 
           material.map = texture;
@@ -127,7 +126,9 @@ export const NeuronMatSystem: NeuronMatSystem = {
           mshader.vertexShader = require(`../shaders/${shader}Vert.glsl`);
           mshader.fragmentShader = require(`../shaders/${shader}Frag.glsl`);
           let colorIdx = clusterData.index % colorList.length;
-          mshader.uniforms.fresnelColor.value = color ? color : colorList[colorIdx];
+          mshader.uniforms.fresnelColor.value = color
+            ? color
+            : colorList[colorIdx];
           clusterData.shader = mshader;
           this.clusterData.push(clusterData);
         };
@@ -156,7 +157,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
-      cameraMove = cameraMove < 3.0 ? 0.0 : 0.5*cameraMove;
+      cameraMove = cameraMove < 3.0 ? 0.0 : 0.5 * cameraMove;
       this.lerpCameraMove = 0.5 * this.lerpCameraMove + 0.5 * cameraMove;
       if (this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
