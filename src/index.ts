@@ -149,7 +149,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
       RenderSystem.configure({
         captureMode: false,
         enableShadows: false,
-        bloom: { enabled: true, intensity: 0.5 },
+        bloom: { enabled: false, intensity: 0.5 },
         fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
       })
     )

@@ -152,7 +152,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
       cameraMove = cameraMove < 3.0 ? 0.0 : 0.5 * cameraMove;
-      this.lerpCameraMove = 0.5 * this.lerpCameraMove + 0.5 * cameraMove;
+      this.lerpCameraMove = 0.7 * this.lerpCameraMove + 0.3 * cameraMove;
       if (this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
       }
