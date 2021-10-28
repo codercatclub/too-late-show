@@ -50,7 +50,9 @@ export const SignMatSystem: SignMatSystem = {
     parent?.traverse((obj) => {
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
-        let materialOptions = {};
+        let materialOptions = {
+          transparent: true
+        };
         const material = new MeshLambertMaterial(materialOptions);
         material.onBeforeCompile = (mshader) => {
           mshader.uniforms = UniformsUtils.merge([uniforms, mshader.uniforms]);
@@ -76,11 +78,12 @@ export const SignMatSystem: SignMatSystem = {
     if (!neuronMatSystem) return;
     let distFromSign = neuronMatSystem.spark.position.distanceTo(this.signPos);
 
-    this.turningOn = distFromSign < 12.5;
+    this.turningOn = distFromSign < 6.5;
     this.materials.forEach((shader) => {
       let dir = this.turningOn ? 1 : -1;
-      let nextVal = shader.uniforms["turnOnT"].value + 16.0 * dir * timeDelta;
-      shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
+      let nextVal = shader.uniforms["turnOnT"].value + 1.0 * dir * timeDelta;
+      //shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
+      shader.uniforms["turnOnT"].value = 1.0 - Math.min(Math.max((distFromSign - 6.5)*0.08, 0), 1);
       shader.uniforms["timeMSec"].value = time;
     });
   },
