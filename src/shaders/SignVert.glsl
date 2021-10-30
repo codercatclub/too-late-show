@@ -39,7 +39,7 @@ void main(){
   float mFresnelScale = 2.1;
   float mFresnelPower = 2.0;
   vReflectionFactor = mFresnelBias + mFresnelScale * abs(pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower ));
-  vReflectionFactor += 0.5*(1.0 - distToTurnOnRing) + 4.0*(1.0 - distToTurnOnRing) * cnoise(5.0*position + timeMSec);
+  vReflectionFactor += 0.5*(1.0 - distToTurnOnRing) + 4.0*(1.0 - distToTurnOnRing) * cnoise(15.0*position + timeMSec);
   vId = color.r;
   #include <fog_vertex>
 }

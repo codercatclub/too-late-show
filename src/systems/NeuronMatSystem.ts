@@ -146,13 +146,15 @@ export const NeuronMatSystem: NeuronMatSystem = {
   updateUniforms: function (time, timeDelta) {
     let cameraPos = new Vector3();
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
-    let cam = renderSystem?.camera?.parent;
+    let cam = renderSystem?.camera?.parent; 
+    let camMoveAmt = renderSystem?.captureMode? 0.9 : 0.5;
+    let camLerpAmt = renderSystem?.captureMode?0.7 : 0.5;
     let cameraMove = 0;
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
-      cameraMove = cameraMove < 3.0 ? 0.0 : 0.5 * cameraMove;
-      this.lerpCameraMove = 0.7 * this.lerpCameraMove + 0.3 * cameraMove;
+      cameraMove = cameraMove < 3.0 ? 0.0 : camMoveAmt * cameraMove;
+      this.lerpCameraMove = camLerpAmt * this.lerpCameraMove + (1.0 - camLerpAmt) * cameraMove;
       if (this.lerpCameraMove < 0.005) {
         this.lerpCameraMove = 0;
       }
