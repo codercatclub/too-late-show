@@ -115,7 +115,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
     Asset({
       src: "assets/models/muscles.glb",
     }),
-    []
+    [newComponent(MuscleMaterialC)]
   );
 
   const env = extend(
@@ -150,7 +150,7 @@ import { SignMatSystem } from "./systems/SignMatSystem";
         captureMode: false,
         enableShadows: false,
         bloom: { enabled: false, intensity: 0.5 },
-        fog: { enabled: true, color: new Color("#060024"), density: 0.01 },
+        fog: { enabled: true, color: new Color("#3c0202"), density: 0.01 },
       })
     )
     .registerSystem(Object3DSystem)

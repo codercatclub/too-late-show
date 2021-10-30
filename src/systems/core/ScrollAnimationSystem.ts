@@ -55,7 +55,8 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
     let removedTutorial = false;
     //get current time by scroll amount
     document.addEventListener("wheel", (event) => {
-      this.lastDelta = 0.5 * event.deltaY;
+      this.lastDelta = 0.25* event.deltaY;
+      this.lastDelta = Math.max(Math.min(this.lastDelta, 3),-3);
 
       if (!removedTutorial) {
         let tutorialEl = document.querySelector("cc-tutorial");

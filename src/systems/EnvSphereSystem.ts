@@ -34,7 +34,7 @@ export const EnvSphereSystem: EnvSphereSystem = {
           value: new Color(0xC30909),
         },
         env_c2: {
-          value: new Color(0x000000),
+          value: new Color(0x00091a),
         },
       };
 

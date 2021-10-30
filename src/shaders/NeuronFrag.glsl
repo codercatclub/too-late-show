@@ -52,13 +52,13 @@ void main() {
 	vec4 texelColor = texture2D( map, vUv ) * 0.7;
 	vec2 p = vUv - vec2(0.5,0.5);
 	float vignette = 2.0 * pow(length(p), 3.0);
-	texelColor.rgb = generic_desaturate(texelColor.rgb, 0.5);
 
 	float scan = 0.5 + 0.5 * sin(250.0*vUv.y + 30.0*timeMSec);
-	texelColor.rgb += 0.1*max(scan, vignette) * fresnelColor;
-
-	texelColor.rgb = mix(texelColor.rgb, fresnelColor, vignette);
-	//texelColor = mapTexelToLinear( texelColor );
+	texelColor.rgb += 0.01*max(scan, vignette);
+	// texelColor.rgb = mix(texelColor.rgb, fresnelColor, vignette);
+	texelColor.r = 3.0*pow(texelColor.r, 2.6);
+	texelColor.g = 2.0*pow(texelColor.g, 2.3);
+	texelColor.b = 2.0*pow(texelColor.b, 2.2);
 	vec4 finalColor = vec4(texelColor.rgb, 1.0);
   #else
     vec4 finalColor = vec4(fresnelColor * vReflectionFactor, vReflectionFactor + 0.5);
