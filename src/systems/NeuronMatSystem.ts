@@ -13,6 +13,7 @@ import {
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
+import { ScrollAnimationSystem } from "./core/ScrollAnimationSystem";
 
 interface ClusterData {
   corePos: Vector3;
@@ -145,17 +146,26 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
   updateUniforms: function (time, timeDelta) {
     let cameraPos = new Vector3();
+    const scrollSystem = this.world?.getSystem<ScrollAnimationSystem>(ScrollAnimationSystem.type);
+    let scrollAmt = scrollSystem?.lastBumpDelta ? scrollSystem?.lastBumpDelta : 0;
+    scrollAmt = -Math.sin(Math.PI * scrollAmt)
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
     let cam = renderSystem?.camera?.parent; 
     let camMoveAmt = renderSystem?.captureMode? 0.9 : 0.5;
-    let camLerpAmt = renderSystem?.captureMode?0.7 : 0.5;
+    let camLerpAmt = renderSystem?.captureMode? 0.7 : 0.5;
     let cameraMove = 0;
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
+      let scrollAdd = 0;
+      if(cameraMove < .0005) {
+        scrollAdd += 0.07*scrollAmt;
+      }
+
       cameraMove = cameraMove < 3.0 ? 0.0 : camMoveAmt * cameraMove;
+      cameraMove += scrollAdd;
       this.lerpCameraMove = camLerpAmt * this.lerpCameraMove + (1.0 - camLerpAmt) * cameraMove;
-      if (this.lerpCameraMove < 0.005) {
+      if (Math.abs(this.lerpCameraMove) < 0.005) {
         this.lerpCameraMove = 0;
       }
       this.lastCameraPosition.copy(cameraPos);

@@ -54,12 +54,12 @@ void main() {
 	float vignette = 2.0 * pow(length(p), 3.0);
 
 	float scan = 0.5 + 0.5 * sin(250.0*vUv.y + 30.0*timeMSec);
-	texelColor.rgb += 0.01*max(scan, vignette);
 	// texelColor.rgb = mix(texelColor.rgb, fresnelColor, vignette);
-	texelColor.r = 3.0*pow(texelColor.r, 2.6);
-	texelColor.g = 2.0*pow(texelColor.g, 2.3);
-	texelColor.b = 2.0*pow(texelColor.b, 2.2);
-	vec4 finalColor = vec4(texelColor.rgb, 1.0);
+	texelColor.r = 3.5*pow(texelColor.r, 3.0);
+	texelColor.g = 3.0*pow(texelColor.g, 3.0);
+	texelColor.b = 3.5*pow(texelColor.b, 3.0);
+	texelColor.rgb += 0.01*max(scan, vignette);
+	vec4 finalColor = vec4(texelColor.rgb, 3.3);
   #else
     vec4 finalColor = vec4(fresnelColor * vReflectionFactor, vReflectionFactor + 0.5);
   #endif
