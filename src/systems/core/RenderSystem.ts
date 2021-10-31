@@ -32,6 +32,7 @@ export interface RenderSystem extends System, RenderSystemConfig {
   setCamera(cam: PerspectiveCamera): void;
   composer: EffectComposer | null;
   timeSinceLastRender: number;
+  exposureAmt: number;
 }
 
 export const RenderSystem: RenderSystem = {
@@ -47,6 +48,7 @@ export const RenderSystem: RenderSystem = {
   bloom: { enabled: false, intensity: 2 },
   composer: null,
   timeSinceLastRender: 0,
+  exposureAmt: 1,
   fog: { enabled: false, color: new Color(1, 1, 1), density: 0.1 },
 
   configure: function ({ enableShadows, captureMode, bloom, fog }) {
@@ -111,14 +113,16 @@ export const RenderSystem: RenderSystem = {
 
     // TODO (Kirill): Remove resize event listener on world.destroy
     window.addEventListener("resize", this.onWindowResize.bind(this), false);
+    this.exposureAmt = 1;
   },
 
   animation: function () {
     if (!this.clock || !this.scene || !this.camera || !this.renderer) return;
-
-    this.timeSinceLastRender += this.clock.getDelta();
+    
+    const deltaTime = this.clock.getDelta();
+    this.timeSinceLastRender += deltaTime;
     const elapsedTime = this.clock.elapsedTime;
-
+    this.exposureAmt = Math.max(this.exposureAmt - 0.3*deltaTime, 0);
     //frame cap at 30 FPS if we are in capture mode
     if (this.captureMode && this.timeSinceLastRender < 1 / 30) {
       return;
@@ -165,6 +169,7 @@ export const RenderSystem: RenderSystem = {
     this.onFrameEnd(elapsedTime, this.timeSinceLastRender);
 
     this.timeSinceLastRender = 0;
+
   },
 
   onWindowResize: function () {

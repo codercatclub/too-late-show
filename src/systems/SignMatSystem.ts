@@ -11,6 +11,7 @@ import {
 } from "three";
 import { getComponent } from "./core/utils";
 import { NeuronMatSystem } from "./NeuronMatSystem";
+import { RenderSystem } from "./core/RenderSystem";
 interface OnNeuronActivateEvent extends CustomEvent {
   detail: {
     idx: number;
@@ -55,6 +56,7 @@ export const SignMatSystem: SignMatSystem = {
       fresnelScale: { type: "f", value: 1 },
       fresnelColor: { type: "color", value: color },
       ignoreReflection: { type: "f", value: ignoreReflection },
+      exposureAmt: { type: "f", value: 1 },
     };
 
     parent?.traverse((obj) => {
@@ -86,6 +88,9 @@ export const SignMatSystem: SignMatSystem = {
     const neuronMatSystem = this.world?.getSystem<typeof NeuronMatSystem>(
       NeuronMatSystem.type
     );
+    const renderSystem = this.world?.getSystem<typeof RenderSystem>(
+      RenderSystem.type
+    );
     if (!neuronMatSystem) return;
     let distFromSign = neuronMatSystem.spark.position.distanceTo(this.signPos);
 
@@ -98,6 +103,7 @@ export const SignMatSystem: SignMatSystem = {
       let nextVal = shader.uniforms["turnOnT"].value + 2.0 * dir * timeDelta;
       shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
       shader.uniforms["timeMSec"].value = time;
+      shader.uniforms["exposureAmt"].value = renderSystem?.exposureAmt;
     });
   },
 

@@ -47,13 +47,13 @@ export const MuscleMatSystem: MuscleMatSystem = {
   processEntity: function (ent) {
     if (!this.world) return;
     const { object3d: parent } = getComponent(ent, Object3DC);
-
     const uniforms = {
       timeMSec: { type: "f", value: 0 },
       cameraMove: { type: "f", value: 0 },
       fresnelScale: { type: "f", value: 1 },
       fresnelColor: { type: "color", value: new Color("#3238a8") },
       idleMove: { type: "f", value: 1 },
+      exposureAmt: { type: "f", value: 1 },
     };
 
     parent?.traverse((obj) => {
@@ -136,6 +136,7 @@ export const MuscleMatSystem: MuscleMatSystem = {
     this.clusterData.forEach((clusterData) => {
       if (clusterData.shader) {
         clusterData.shader.uniforms["timeMSec"].value = time;
+        clusterData.shader.uniforms["exposureAmt"].value = renderSystem?.exposureAmt;
         clusterData.shader.uniforms["cameraMove"].value = this.lerpCameraMove;
       }
     });

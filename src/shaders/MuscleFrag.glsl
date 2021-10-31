@@ -9,7 +9,7 @@ uniform float cameraMove;
 uniform vec3 fresnelColor;
 
 #include <fog_pars_fragment>
-
+@import ./ExposureFragPars;
 void main() {
   vec3 finalColor = fresnelColor;
   gl_FragColor = vec4(finalColor, vReflectionFactor);
@@ -44,4 +44,5 @@ void main() {
 #endif
 
 gl_FragColor.rgb *= vColor;
+@import ./ExposureFrag;
 }

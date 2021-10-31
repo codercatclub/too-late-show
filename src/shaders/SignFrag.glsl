@@ -13,7 +13,7 @@ varying float vId;
 
 #include <fog_pars_fragment>
 @import ./NoiseFx; 
-
+@import ./ExposureFragPars;
 vec3 spectral_jet(float w)
 {
 	w = 400.0 + 300.0 * w;
@@ -44,4 +44,5 @@ void main() {
   gl_FragColor.a = whiteout1;
   gl_FragColor.rgb += whiteout2 * ignoreReflection * fresnelColor;
   #include <fog_fragment>
+ @import ./ExposureFrag;
 }

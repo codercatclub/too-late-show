@@ -70,6 +70,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
       cameraMove: { type: "f", value: 0 },
       sparkPos: { type: "color", value: new Vector3() },
       fresnelColor: { type: "color", value: new Color("#56ff00") },
+      exposureAmt: { type: "f", value: 1 },
     };
     let materialOptions = {
       transparent: true,
@@ -228,6 +229,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;
+        clusterData.shader.uniforms["exposureAmt"].value = renderSystem?.exposureAmt;
         clusterData.shader.uniforms["cameraMove"].value = this.lerpCameraMove;
         clusterData.shader.uniforms["sparkPos"].value.copy(this.spark.position);
       }

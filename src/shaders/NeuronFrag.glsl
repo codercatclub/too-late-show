@@ -11,7 +11,7 @@ uniform float playT;
 uniform float cameraMove;
 uniform vec3 fresnelColor;
 #include <fog_pars_fragment>
-
+@import ./ExposureFragPars;
 #ifdef USE_MAP
 	uniform sampler2D map;
 	varying vec2 vUv;
@@ -92,4 +92,5 @@ void main() {
   #endif
 
   #include <fog_fragment>
+  @import ./ExposureFrag;
 }
