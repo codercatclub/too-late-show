@@ -88,7 +88,8 @@ import { SignMatSystem } from "./systems/SignMatSystem";
       src: "assets/models/sign.glb",
       part: "/Scene/lora",
     }),
-    [newComponent(SignMaterialC, { color: new Color("#e87d5f") })]
+    [newComponent(SignMaterialC, { color: new Color(
+      "#b433f5") })]
   );
 
   const eyes = extend(

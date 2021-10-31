@@ -37,11 +37,11 @@ vec3 spectral_jet(float w)
 void main() {
   float jetFactor = max(vReflectionFactor - 0.2 - 1.8*(blackout), 0.0);
   vec3 finalColor = fresnelColor * jetFactor * spectral_jet(jetFactor - 0.4);
-  float whiteout1 = 0.9 + 0.3 * smoothstep(0.7,0.8,turnOnT);
+  finalColor *= max(jetFactor-0.4, 0.0);
+  float whiteout1 = 0.83 + 0.3 * smoothstep(0.7,0.8,turnOnT);
   float whiteout2 = smoothstep(0.9,1.0,turnOnT);
-
-  gl_FragColor = (0.5 + 0.5*turnOnT) * vec4(finalColor, whiteout1);
+  gl_FragColor.rgb = 3.0*(0.5 + 0.5*turnOnT) * finalColor + 0.08*fresnelColor;
+  gl_FragColor.a = whiteout1;
   gl_FragColor.rgb += whiteout2 * ignoreReflection * fresnelColor;
-
   #include <fog_fragment>
 }

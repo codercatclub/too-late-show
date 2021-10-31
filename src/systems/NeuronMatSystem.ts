@@ -197,7 +197,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
             this.isPlayingVideo = true;
           }
 
-          const event = new CustomEvent("play-activation-sound");
+          const event = new CustomEvent("play-activation-sound", {
+            detail: {
+              idx: clusterData.index
+            }
+          });
           window.dispatchEvent(event);
         }
 

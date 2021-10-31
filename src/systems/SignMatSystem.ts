@@ -11,7 +11,11 @@ import {
 } from "three";
 import { getComponent } from "./core/utils";
 import { NeuronMatSystem } from "./NeuronMatSystem";
-
+interface OnNeuronActivateEvent extends CustomEvent {
+  detail: {
+    idx: number;
+  };
+}
 interface SignMatSystem extends System {
   world: World | null;
   processEntity: (ent: Entity) => void;
@@ -33,6 +37,12 @@ export const SignMatSystem: SignMatSystem = {
     this.world = world;
     this.entities = applyQuery(world.entities, this.queries);
     this.entities.forEach(this.processEntity.bind(this));
+
+    window.addEventListener("play-activation-sound", ((event : OnNeuronActivateEvent) => {
+     if(event.detail.idx == 9) {
+       this.turningOn = true;
+     }
+    }) as EventListener);
   },
 
   processEntity: function (ent) {
@@ -50,6 +60,7 @@ export const SignMatSystem: SignMatSystem = {
     parent?.traverse((obj) => {
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
+        o.renderOrder = 10;
         let materialOptions = {
           transparent: true
         };
@@ -78,12 +89,14 @@ export const SignMatSystem: SignMatSystem = {
     if (!neuronMatSystem) return;
     let distFromSign = neuronMatSystem.spark.position.distanceTo(this.signPos);
 
-    this.turningOn = distFromSign < 6.5;
+    if(distFromSign > 7) {
+      this.turningOn = false;
+    }
+
     this.materials.forEach((shader) => {
       let dir = this.turningOn ? 1 : -1;
-      let nextVal = shader.uniforms["turnOnT"].value + 1.0 * dir * timeDelta;
-      //shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
-      shader.uniforms["turnOnT"].value = 1.0 - Math.min(Math.max((distFromSign - 6.5)*0.08, 0), 1);
+      let nextVal = shader.uniforms["turnOnT"].value + 2.0 * dir * timeDelta;
+      shader.uniforms["turnOnT"].value = Math.min(Math.max(nextVal, 0), 1);
       shader.uniforms["timeMSec"].value = time;
     });
   },

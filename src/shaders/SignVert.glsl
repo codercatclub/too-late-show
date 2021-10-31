@@ -22,10 +22,9 @@ void main(){
 
 
   vec4 worldPos = modelMatrix * vec4(position, 1.0);
-  vWorldPos = worldPos.xyz;
 
-  vec4 mvPosition = viewMatrix * worldPos;
-  gl_Position = projectionMatrix * mvPosition;
+
+
 
   //FRESNEL
   vec3 I = worldPos.xyz - cameraPosition;
@@ -35,11 +34,17 @@ void main(){
   vNormal.z += (0.1*blackout + 0.1)*cos(0.3*timeMSec);
   vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normalize(vNormal) );
 
+  worldPos.xyz += 0.5*(1.0-distToTurnOnRing)*(1.0-turnOnT)*vec3(0.0, 1.0, 0.0);
+  vWorldPos = worldPos.xyz;
+  vec4 mvPosition = viewMatrix * worldPos;
+  gl_Position = projectionMatrix * mvPosition;
+
+
   float mFresnelBias = 0.5;
   float mFresnelScale = 2.1;
   float mFresnelPower = 2.0;
   vReflectionFactor = mFresnelBias + mFresnelScale * abs(pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower ));
-  vReflectionFactor += 0.5*(1.0 - distToTurnOnRing) + 4.0*(1.0 - distToTurnOnRing) * cnoise(15.0*position + timeMSec);
+  vReflectionFactor += 0.5*(1.0 - distToTurnOnRing) + 4.0*(1.0 - distToTurnOnRing) * cnoise(10.0*position + timeMSec);
   vId = color.r;
   #include <fog_vertex>
 }
