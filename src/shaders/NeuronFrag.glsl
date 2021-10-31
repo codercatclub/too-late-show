@@ -4,6 +4,7 @@ varying float vDist;
 varying float vReflectionFactor;
 varying float glitchFactor;
 varying float decay;
+uniform vec3 sparkPos;
 
 uniform float timeMSec;
 uniform float playT;
@@ -73,14 +74,22 @@ void main() {
 	);
   vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
   finalColor.rgb += glitchColor;
-  finalColor.rgb += 10.0 * (brightness + flash) * vec3(1.0, 1.0, 1.0);
+  finalColor.rgb += 2.0 * (brightness + flash) * vec3(0.8, 0.8, 1.0);
 
   float m = glitchFactor + 0.3 * sin(3.0*vWorldPos.x) + 0.2 * cos(4.0*vWorldPos.y);
 
   float r = smoothstep (0.5, 1.0, floor(7.0 * m - 2.0)/7.0 );
   finalColor.rgb += decay * step(0.001,r) * spectral_jet(r);
+
+
+  float fallofDistToSpark = 1.0 -min(length(vWorldPos - sparkPos)*0.7, 1.0);
   
   gl_FragColor = finalColor;
+  #ifdef USE_MAP
+  gl_FragColor.rgb += 1.0*pow(fallofDistToSpark,3.0) * vec3(0.0,0.1,0.4);
+  #else
+  gl_FragColor.rgb += 7.0*pow(fallofDistToSpark,3.0) * vec3(0.0,0.1,0.4);
+  #endif
 
   #include <fog_fragment>
 }

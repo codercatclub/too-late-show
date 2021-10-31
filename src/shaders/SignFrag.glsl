@@ -40,7 +40,7 @@ void main() {
   finalColor *= max(jetFactor-0.4, 0.0);
   float whiteout1 = 0.83 + 0.3 * smoothstep(0.7,0.8,turnOnT);
   float whiteout2 = smoothstep(0.9,1.0,turnOnT);
-  gl_FragColor.rgb = 3.0*(0.5 + 0.5*turnOnT) * finalColor + 0.08*fresnelColor;
+  gl_FragColor.rgb = 8.0*(0.5 + 0.5*turnOnT) * finalColor + 0.08*fresnelColor;
   gl_FragColor.a = whiteout1;
   gl_FragColor.rgb += whiteout2 * ignoreReflection * fresnelColor;
   #include <fog_fragment>

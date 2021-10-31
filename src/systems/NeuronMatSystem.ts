@@ -68,6 +68,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
       timeMSec: { type: "f", value: 0 },
       playT: { type: "f", value: 0 },
       cameraMove: { type: "f", value: 0 },
+      sparkPos: { type: "color", value: new Vector3() },
       fresnelColor: { type: "color", value: new Color("#56ff00") },
     };
     let materialOptions = {
@@ -77,6 +78,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
     parent?.traverse((obj) => {
       if (obj.name == "Spark") {
         this.spark = obj;
+        this.spark.visible = false;
       }
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
@@ -227,6 +229,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;
         clusterData.shader.uniforms["cameraMove"].value = this.lerpCameraMove;
+        clusterData.shader.uniforms["sparkPos"].value.copy(this.spark.position);
       }
     });
   },
