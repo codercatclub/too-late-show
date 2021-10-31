@@ -122,7 +122,7 @@ export const RenderSystem: RenderSystem = {
     const deltaTime = this.clock.getDelta();
     this.timeSinceLastRender += deltaTime;
     const elapsedTime = this.clock.elapsedTime;
-    this.exposureAmt = Math.max(this.exposureAmt - 0.3*deltaTime, 0);
+    this.exposureAmt = Math.max(this.exposureAmt - 0.2*deltaTime, 0);
     //frame cap at 30 FPS if we are in capture mode
     if (this.captureMode && this.timeSinceLastRender < 1 / 30) {
       return;
