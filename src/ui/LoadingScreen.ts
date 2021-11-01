@@ -33,7 +33,7 @@ export default class LoadingScreen extends HTMLElement {
 
     const styleString = css`
       #loading-screen {
-        display: none;
+        display: visible;
         position: fixed;
         top: 0;
         bottom: 0;
@@ -42,7 +42,7 @@ export default class LoadingScreen extends HTMLElement {
         justify-content: center;
         align-items: center;
         z-index: 1000;
-        background-color: rgb(24, 23, 23);
+        background-color: rgb(255, 255, 255);
       }
 
       .load-container {
@@ -51,21 +51,21 @@ export default class LoadingScreen extends HTMLElement {
         font-family: Courier New, Courier, monospace;
         font-size: 12px;
         width: 240px;
-        color: rgba(255, 255, 255, 0.87);
+        color: rgba(0, 0, 0, 0.87);
       }
 
       #progress {
         width: 100%;
         border-style: solid;
         border-width: 1px;
-        border-color: white;
+        border-color: black;
         margin-bottom: 5px;
       }
 
       #bar {
         width: 1%;
         height: 10px;
-        background-color: white;
+        background-color: black;
       }
 
       @media screen and (max-width: 768px) {
