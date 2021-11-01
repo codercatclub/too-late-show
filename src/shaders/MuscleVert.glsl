@@ -4,7 +4,7 @@ uniform float cameraMove;
 attribute vec3 color;
 
 varying vec3 vNormal;
-varying float vDist;
+varying vec3 vColor;
 varying vec3 vWorldPos;
 varying float vReflectionFactor;
 
@@ -18,7 +18,7 @@ void main(){
 
   vWorldPos = worldPos.xyz;
 
-  vDist = color.r;
+  vColor = color;
 
   vec4 mvPosition = viewMatrix * worldPos;
   gl_Position = projectionMatrix * mvPosition;

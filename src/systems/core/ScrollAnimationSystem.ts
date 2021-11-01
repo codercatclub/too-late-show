@@ -9,11 +9,12 @@ import { applyQuery } from "../../ecs/index";
 import { getComponent } from "./utils";
 import { AnimationMixer } from "three";
 import { RenderSystem } from "./RenderSystem";
-
 export interface ScrollAnimationSystem extends System {
   mixers: Map<string, AnimationMixer>;
   scrollTime: number;
   lastDelta: number;
+  lastBumpDelta: number;
+  canBump: boolean;
   lastRealDelta: number;
   moving: boolean;
   world: World | null;
@@ -25,6 +26,8 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
   mixers: new Map(),
   scrollTime: 0,
   lastDelta: 0,
+  lastBumpDelta: 0,
+  canBump: true,
   lastRealDelta: 0,
   moving: false,
   world: null,
@@ -55,7 +58,14 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
     let removedTutorial = false;
     //get current time by scroll amount
     document.addEventListener("wheel", (event) => {
-      this.lastDelta = 0.5 * event.deltaY;
+      let curDelta = this.lastDelta;
+      this.lastDelta = 0.25* event.deltaY;
+      this.lastDelta = Math.max(Math.min(this.lastDelta, 3),-3);
+
+      if(Math.abs(this.lastDelta) - Math.abs(curDelta) > 2 && this.canBump) {
+        this.canBump = false;
+        this.lastBumpDelta = 1*Math.sign(this.lastDelta);
+      }
 
       if (!removedTutorial) {
         let tutorialEl = document.querySelector("cc-tutorial");
@@ -66,6 +76,11 @@ export const ScrollAnimationSystem: ScrollAnimationSystem = {
   },
 
   tick: function (_time, deltaTime) {
+
+    this.lastBumpDelta *= 0.9;
+    if(Math.abs(this.lastBumpDelta) < 0.01) {
+      this.canBump = true;
+    }
     //only hard set delta if autoscrolling in capture mode
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
     let updateAmt = deltaTime * this.lastDelta;

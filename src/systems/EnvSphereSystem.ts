@@ -1,6 +1,6 @@
 import { System } from "../ecs/index";
 import { TransformC, Object3DC, EnvSphereC } from "../ecs/components";
-import { applyQuery } from "../ecs/index";
+import { applyQuery, World } from "../ecs/index";
 import { getComponent } from "./core/utils";
 import {
   Color,
@@ -9,33 +9,37 @@ import {
   Shader,
   UniformsUtils,
 } from "three";
+import { RenderSystem } from "./core/RenderSystem";
 
 interface EnvSphereSystem extends System {
+  world: World | null;
   shaders: Shader[];
 }
 
 export const EnvSphereSystem: EnvSphereSystem = {
   type: "EnvSphereSystem",
+  world: null,
   queries: [TransformC, Object3DC, EnvSphereC],
   entities: [],
   shaders: [],
 
   init: function (world) {
     this.entities = applyQuery(world.entities, this.queries);
-
+    this.world = world;
     this.entities.forEach((ent) => {
       const { object3d } = getComponent(ent, Object3DC);
 
       const uniforms = {
-        time: {
+        timeMSec: {
           value: 0,
         },
         env_c1: {
           value: new Color(0xC30909),
         },
         env_c2: {
-          value: new Color(0x000000),
+          value: new Color(0x00091a),
         },
+        exposureAmt: { type: "f", value: 1 },
       };
 
       object3d.traverse((obj) => {
@@ -63,8 +67,12 @@ export const EnvSphereSystem: EnvSphereSystem = {
   },
 
   tick: function (time) {
+    const renderSystem = this.world?.getSystem<typeof RenderSystem>(
+      RenderSystem.type
+    );
     this.shaders.forEach((shader) => {
-      shader.uniforms.time.value = time;
+      shader.uniforms.timeMSec.value = time;
+      shader.uniforms.exposureAmt.value = renderSystem?.exposureAmt;
     });
   },
 };

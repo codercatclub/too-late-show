@@ -13,6 +13,7 @@ import {
 } from "three";
 import { getComponent } from "./core/utils";
 import { RenderSystem } from "./core/RenderSystem";
+import { ScrollAnimationSystem } from "./core/ScrollAnimationSystem";
 
 interface ClusterData {
   corePos: Vector3;
@@ -35,8 +36,8 @@ interface NeuronMatSystem extends System {
 }
 
 const colorList = [
-  new Color("#590100"),
-  new Color("#8f0200"),
+  new Color("#29001b"),
+  new Color("#290015"),
   new Color("#121214"),
 ];
 
@@ -67,7 +68,9 @@ export const NeuronMatSystem: NeuronMatSystem = {
       timeMSec: { type: "f", value: 0 },
       playT: { type: "f", value: 0 },
       cameraMove: { type: "f", value: 0 },
+      sparkPos: { type: "color", value: new Vector3() },
       fresnelColor: { type: "color", value: new Color("#56ff00") },
+      exposureAmt: { type: "f", value: 1 },
     };
     let materialOptions = {
       transparent: true,
@@ -76,6 +79,7 @@ export const NeuronMatSystem: NeuronMatSystem = {
     parent?.traverse((obj) => {
       if (obj.name == "Spark") {
         this.spark = obj;
+        this.spark.visible = false;
       }
       if (obj.type === "Mesh") {
         const o = obj as Mesh;
@@ -145,15 +149,26 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
   updateUniforms: function (time, timeDelta) {
     let cameraPos = new Vector3();
+    const scrollSystem = this.world?.getSystem<ScrollAnimationSystem>(ScrollAnimationSystem.type);
+    let scrollAmt = scrollSystem?.lastBumpDelta ? scrollSystem?.lastBumpDelta : 0;
+    scrollAmt = -Math.sin(Math.PI * scrollAmt)
     const renderSystem = this.world?.getSystem<RenderSystem>(RenderSystem.type);
-    let cam = renderSystem?.camera?.parent;
+    let cam = renderSystem?.camera?.parent; 
+    let camMoveAmt = renderSystem?.captureMode? 0.9 : 0.5;
+    let camLerpAmt = renderSystem?.captureMode? 0.7 : 0.5;
     let cameraMove = 0;
     if (cam) {
       cameraPos = cam.position;
       cameraMove = cameraPos.distanceTo(this.lastCameraPosition);
-      cameraMove = cameraMove < 3.0 ? 0.0 : 0.5 * cameraMove;
-      this.lerpCameraMove = 0.7 * this.lerpCameraMove + 0.3 * cameraMove;
-      if (this.lerpCameraMove < 0.005) {
+      let scrollAdd = 0;
+      if(cameraMove < .0005) {
+        scrollAdd += 0.07*scrollAmt;
+      }
+
+      cameraMove = cameraMove < 3.0 ? 0.0 : camMoveAmt * cameraMove;
+      cameraMove += scrollAdd;
+      this.lerpCameraMove = camLerpAmt * this.lerpCameraMove + (1.0 - camLerpAmt) * cameraMove;
+      if (Math.abs(this.lerpCameraMove) < 0.005) {
         this.lerpCameraMove = 0;
       }
       this.lastCameraPosition.copy(cameraPos);
@@ -185,7 +200,11 @@ export const NeuronMatSystem: NeuronMatSystem = {
             this.isPlayingVideo = true;
           }
 
-          const event = new CustomEvent("play-activation-sound");
+          const event = new CustomEvent("play-activation-sound", {
+            detail: {
+              idx: clusterData.index
+            }
+          });
           window.dispatchEvent(event);
         }
 
@@ -210,7 +229,9 @@ export const NeuronMatSystem: NeuronMatSystem = {
 
         clusterData.shader.uniforms["playT"].value = playT;
         clusterData.shader.uniforms["timeMSec"].value = time;
+        clusterData.shader.uniforms["exposureAmt"].value = renderSystem?.exposureAmt;
         clusterData.shader.uniforms["cameraMove"].value = this.lerpCameraMove;
+        clusterData.shader.uniforms["sparkPos"].value.copy(this.spark.position);
       }
     });
   },

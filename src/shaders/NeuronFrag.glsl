@@ -4,13 +4,14 @@ varying float vDist;
 varying float vReflectionFactor;
 varying float glitchFactor;
 varying float decay;
+uniform vec3 sparkPos;
 
 uniform float timeMSec;
 uniform float playT;
 uniform float cameraMove;
 uniform vec3 fresnelColor;
 #include <fog_pars_fragment>
-
+@import ./ExposureFragPars;
 #ifdef USE_MAP
 	uniform sampler2D map;
 	varying vec2 vUv;
@@ -52,14 +53,14 @@ void main() {
 	vec4 texelColor = texture2D( map, vUv ) * 0.7;
 	vec2 p = vUv - vec2(0.5,0.5);
 	float vignette = 2.0 * pow(length(p), 3.0);
-	texelColor.rgb = generic_desaturate(texelColor.rgb, 0.5);
 
 	float scan = 0.5 + 0.5 * sin(250.0*vUv.y + 30.0*timeMSec);
-	texelColor.rgb += 0.1*max(scan, vignette) * fresnelColor;
-
-	texelColor.rgb = mix(texelColor.rgb, fresnelColor, vignette);
-	//texelColor = mapTexelToLinear( texelColor );
-	vec4 finalColor = vec4(texelColor.rgb, 1.0);
+	// texelColor.rgb = mix(texelColor.rgb, fresnelColor, vignette);
+	texelColor.r = 3.5*pow(texelColor.r, 3.0);
+	texelColor.g = 3.0*pow(texelColor.g, 3.0);
+	texelColor.b = 3.5*pow(texelColor.b, 3.0);
+	texelColor.rgb += 0.01*max(scan, vignette);
+	vec4 finalColor = vec4(texelColor.rgb, 3.3);
   #else
     vec4 finalColor = vec4(fresnelColor * vReflectionFactor, vReflectionFactor + 0.5);
   #endif
@@ -73,14 +74,23 @@ void main() {
 	);
   vec3 glitchColor = cameraMove * pow(vReflectionFactor, 12.0) * fractBy3;
   finalColor.rgb += glitchColor;
-  finalColor.rgb += 10.0 * (brightness + flash) * vec3(1.0, 1.0, 1.0);
+  finalColor.rgb += 2.0 * (brightness + flash) * vec3(0.8, 0.8, 1.0);
 
   float m = glitchFactor + 0.3 * sin(3.0*vWorldPos.x) + 0.2 * cos(4.0*vWorldPos.y);
 
   float r = smoothstep (0.5, 1.0, floor(7.0 * m - 2.0)/7.0 );
   finalColor.rgb += decay * step(0.001,r) * spectral_jet(r);
+
+
+  float fallofDistToSpark = 1.0 -min(length(vWorldPos - sparkPos)*0.7, 1.0);
   
   gl_FragColor = finalColor;
+  #ifdef USE_MAP
+  gl_FragColor.rgb += 1.0*pow(fallofDistToSpark,3.0) * vec3(0.0,0.1,0.4);
+  #else
+  gl_FragColor.rgb += 7.0*pow(fallofDistToSpark,3.0) * vec3(0.0,0.1,0.4);
+  #endif
 
   #include <fog_fragment>
+  @import ./ExposureFrag;
 }
